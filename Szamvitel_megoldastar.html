@@ -1,0 +1,998 @@
+<!doctype html>
+<html lang="hu">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Számvitel megoldástár</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Főkönyvi lap: bal oldalt példa-index, jobbra lépésenkénti könyvelés T-számlákon, alatta a három kimutatás. */
+:root{
+  --bg:#EEF2F1; --surface:#FFFFFF; --sunk:#F6F8F7; --ink:#16222A; --muted:#5A6B73; --rule:#D3DCDB;
+  --accent:#23664A; --accent-soft:#DDEDE4;
+  --deb:#1D5A8C; --deb-soft:#E2ECF5; --cre:#9C3434; --cre-soft:#F6E4E2;
+  --c-eszk:#1D5A8C; --c-forr:#7A4E12; --c-tok:#5B3F86; --c-kolt:#9C3434; --c-bev:#23664A;
+  --warn-bg:#FBF3DF; --warn-ink:#6B4A07;
+  --f-disp:"IBM Plex Sans Condensed","Arial Narrow",system-ui,sans-serif;
+  --f-body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#10181C; --surface:#18232A; --sunk:#141E23; --ink:#E3EAEC; --muted:#93A4AC; --rule:#2B3A42;
+  --accent:#6BC49A; --accent-soft:#1D3A2E;
+  --deb:#77B0E0; --deb-soft:#1B2F40; --cre:#E68E89; --cre-soft:#3A2224;
+  --c-eszk:#77B0E0; --c-forr:#E0B36F; --c-tok:#B9A0E6; --c-kolt:#E68E89; --c-bev:#6BC49A;
+  --warn-bg:#33290F; --warn-ink:#EBCB82; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#10181C; --surface:#18232A; --sunk:#141E23; --ink:#E3EAEC; --muted:#93A4AC; --rule:#2B3A42;
+  --accent:#6BC49A; --accent-soft:#1D3A2E;
+  --deb:#77B0E0; --deb-soft:#1B2F40; --cre:#E68E89; --cre-soft:#3A2224;
+  --c-eszk:#77B0E0; --c-forr:#E0B36F; --c-tok:#B9A0E6; --c-kolt:#E68E89; --c-bev:#6BC49A;
+  --warn-bg:#33290F; --warn-ink:#EBCB82; color-scheme:dark}
+
+*{box-sizing:border-box}
+html{color-scheme:light}
+body{margin:0}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.55;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 48px}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.num{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+
+.top{max-width:1320px;margin:0 auto 18px;display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px 24px;border-bottom:2px solid var(--ink);padding-bottom:12px}
+.brand h1{font-family:var(--f-disp);font-weight:700;font-size:clamp(26px,3.4vw,36px);line-height:1.05;margin:0;letter-spacing:-.01em}
+.brand p{margin:4px 0 0;color:var(--muted);font-size:14px}
+.legend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:12.5px;color:var(--muted)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend b{font-family:var(--f-mono);font-weight:600}
+.dot{width:9px;height:9px;border-radius:2px;display:inline-block}
+
+.wrap{max-width:1320px;margin:0 auto;display:grid;grid-template-columns:272px minmax(0,1fr);gap:28px;align-items:start}
+nav{position:sticky;top:calc(env(safe-area-inset-top,0px) + 12px);max-height:calc(100vh - 24px);overflow:auto;padding-right:4px}
+nav .lbl{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:0 0 8px 8px;font-weight:600}
+nav ol{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:1px}
+nav button{width:100%;display:grid;grid-template-columns:30px 1fr;gap:6px;align-items:baseline;text-align:left;background:none;border:0;border-radius:4px;padding:6px 8px;cursor:pointer;color:var(--ink);font-size:13.5px;line-height:1.3}
+nav button .n{font-family:var(--f-mono);font-size:12px;color:var(--muted)}
+nav button:hover{background:var(--surface)}
+nav button[aria-current="true"]{background:var(--ink);color:var(--bg)}
+nav button[aria-current="true"] .n{color:var(--bg);opacity:.75}
+
+main{min-width:0;display:flex;flex-direction:column;gap:22px}
+.head .eyebrow{font-family:var(--f-mono);font-size:12px;letter-spacing:.06em;color:var(--muted);text-transform:uppercase}
+.head .eyebrow em{font-style:normal;color:var(--accent);font-weight:600}
+.head h2{font-family:var(--f-disp);font-weight:700;font-size:clamp(24px,3vw,32px);line-height:1.1;margin:4px 0 12px;text-wrap:balance}
+.task{background:var(--surface);border:1px solid var(--rule);border-radius:4px;padding:14px 16px;margin:0;max-width:78ch;font-size:15px}
+.task::before{content:"Feladat";display:block;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:600;margin-bottom:4px}
+
+.sec-t{font-family:var(--f-disp);font-weight:600;font-size:19px;margin:0 0 10px;display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.sec-t small{font-family:var(--f-body);font-weight:400;font-size:13px;color:var(--muted)}
+
+/* lejátszó */
+.player{background:var(--surface);border:1px solid var(--rule);border-radius:4px;padding:16px}
+.ctrl{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;margin-bottom:14px}
+.btn{border:1px solid var(--rule);background:var(--sunk);border-radius:4px;padding:7px 12px;cursor:pointer;font-size:14px;font-weight:500;display:inline-flex;align-items:center;gap:6px}
+.btn:hover:not(:disabled){border-color:var(--ink)}
+.btn:disabled{opacity:.4;cursor:default}
+.btn.pri{background:var(--accent);border-color:var(--accent);color:var(--surface)}
+.btn.pri:hover:not(:disabled){filter:brightness(1.08);border-color:var(--accent)}
+.dots{display:flex;gap:5px;flex-wrap:wrap;margin-left:auto}
+.dots button{width:30px;height:30px;border-radius:4px;border:1px solid var(--rule);background:var(--sunk);font-family:var(--f-mono);font-size:12px;cursor:pointer;color:var(--muted)}
+.dots button.done{background:var(--accent-soft);color:var(--accent);border-color:transparent}
+.dots button.cur{background:var(--accent);color:var(--surface);border-color:var(--accent)}
+
+.stepbox{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:14px;margin-bottom:16px}
+.expl{border-left:3px solid var(--accent);padding:4px 0 4px 14px;min-height:70px}
+.expl .k{font-family:var(--f-mono);font-size:12px;color:var(--accent);font-weight:600;letter-spacing:.04em}
+.expl p{margin:4px 0 0;font-size:15.5px;max-width:62ch}
+.journal{background:var(--sunk);border:1px dashed var(--rule);border-radius:4px;padding:10px 12px;font-size:13.5px;align-self:start}
+.journal .jt{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:600;margin-bottom:6px}
+.jl{display:grid;grid-template-columns:22px minmax(0,1fr) auto;gap:8px;align-items:baseline;padding:3px 0}
+.jl .s{font-family:var(--f-mono);font-weight:600;font-size:12px;text-align:center;border-radius:3px;padding:0 2px}
+.jl.T .s{background:var(--deb-soft);color:var(--deb)} .jl.K .s{background:var(--cre-soft);color:var(--cre)}
+.jl.K .a{padding-left:14px}
+.jl .v{font-family:var(--f-mono);font-variant-numeric:tabular-nums;font-weight:500}
+.journal .none{color:var(--muted);font-style:italic}
+
+.taccs{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px}
+.tacc{border:1px solid var(--rule);border-radius:4px;background:var(--surface);overflow:hidden;animation:pop .45s ease both}
+.tacc.hot{border-color:var(--accent)}
+.th{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:7px 10px 6px;border-bottom:2px solid var(--ink)}
+.th .nm{font-weight:600;font-size:13.5px;line-height:1.25}
+.cat{font-size:10px;letter-spacing:.08em;text-transform:uppercase;font-weight:600;white-space:nowrap}
+.tb{display:grid;grid-template-columns:1fr 1fr;min-height:56px}
+.tb .col{padding:4px 8px 6px;display:flex;flex-direction:column;gap:2px}
+.tb .col.d{border-right:2px solid var(--ink)}
+.tb .ch{font-size:10px;color:var(--muted);letter-spacing:.08em;font-weight:600}
+.tb .col.c .ch{text-align:right}
+.r{display:flex;justify-content:space-between;gap:4px;font-family:var(--f-mono);font-variant-numeric:tabular-nums;font-size:13px;border-radius:3px;padding:1px 3px}
+.r i{font-style:normal;font-size:10px;color:var(--muted);align-self:center}
+.col.d .r span{color:var(--deb)} .col.c .r span{color:var(--cre)}
+.r.new{animation:ink 1.4s ease both}
+.col.d .r.new{--hl:var(--deb-soft)} .col.c .r.new{--hl:var(--cre-soft)}
+.tf{border-top:1px solid var(--rule);padding:5px 10px;font-size:12px;color:var(--muted);display:flex;justify-content:space-between;background:var(--sunk)}
+.tf b{font-family:var(--f-mono);color:var(--ink);font-weight:600}
+.empty{color:var(--muted);font-style:italic;font-size:14px;padding:10px 0}
+@keyframes pop{from{opacity:.0;transform:translateY(6px) scale(.98)}to{opacity:1;transform:none}}
+@keyframes ink{0%{background:var(--hl);transform:translateX(-10px);opacity:0}25%{transform:none;opacity:1}100%{background:transparent}}
+
+/* kimutatások */
+.stmts{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px}
+.card{background:var(--surface);border:1px solid var(--rule);border-radius:4px;padding:14px 16px;min-width:0}
+.card.wide{grid-column:1/-1}
+.card h3{font-family:var(--f-disp);font-size:17px;font-weight:600;margin:0 0 8px;display:flex;justify-content:space-between;gap:10px;align-items:baseline;flex-wrap:wrap}
+.badge{font-family:var(--f-body);font-size:11.5px;font-weight:600;padding:2px 8px;border-radius:99px;background:var(--accent-soft);color:var(--accent)}
+.bs{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:0 24px}
+.bs .side h4{margin:0 0 4px;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.row{display:flex;justify-content:space-between;gap:10px;padding:3px 0;font-size:13.5px;border-bottom:1px dotted var(--rule);animation:fadeup .4s ease both}
+.row .v{font-family:var(--f-mono);font-variant-numeric:tabular-nums;white-space:nowrap}
+.row.l0{font-weight:600}
+.row.l1{padding-left:14px}
+.row.l2{padding-left:28px;color:var(--muted)} .row.l2 .v{color:var(--ink)}
+.row.it{padding-left:14px;color:var(--muted)} .row.it .v{color:var(--ink)}
+.row.sub{font-weight:600}
+.row.tot{border-bottom:0;border-top:2px solid var(--ink);margin-top:4px;padding-top:6px;font-weight:700}
+.row.zero .v{opacity:.45}
+.row .v.neg{color:var(--cre)}
+@keyframes fadeup{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+
+.take{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px}
+.take .card p{margin:0;max-width:70ch}
+.lbl2{font-size:11px;letter-spacing:.12em;text-transform:uppercase;font-weight:600;color:var(--accent);margin-bottom:4px}
+.note{background:var(--warn-bg);border-color:transparent}
+.note .lbl2{color:var(--warn-ink)}
+.note p{color:var(--warn-ink)}
+.pager{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.pager .btn{max-width:48%;text-align:left}
+.kbd{font-size:12px;color:var(--muted)}
+.kbd kbd{font-family:var(--f-mono);font-size:11px;border:1px solid var(--rule);border-bottom-width:2px;border-radius:3px;padding:0 4px;background:var(--surface)}
+
+@media (max-width:900px){
+  .wrap{grid-template-columns:minmax(0,1fr);gap:16px}
+  nav{position:static;max-height:none;overflow-x:auto;overflow-y:hidden;padding:0 0 6px}
+  nav .lbl{display:none}
+  nav ol{flex-direction:row;gap:4px}
+  nav button{grid-template-columns:1fr;width:auto;min-width:38px;padding:7px 6px;text-align:center;border:1px solid var(--rule);background:var(--surface)}
+  nav button .t{display:none}
+  nav button .n{font-size:13px;color:var(--ink)}
+  .stepbox,.stmts,.take,.bs{grid-template-columns:minmax(0,1fr)}
+  .bs{gap:14px}
+  .dots{margin-left:0;width:100%}
+  .kbd{display:none}
+}
+
+/* szakaszok */
+.phases{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:14px;border-bottom:1px solid var(--rule);padding-bottom:10px}
+.phases button{border:0;background:none;padding:6px 10px 6px 6px;border-radius:4px;cursor:pointer;font-size:13.5px;font-weight:500;color:var(--muted);display:inline-flex;align-items:center;gap:7px}
+.phases button span{font-family:var(--f-mono);font-size:11px;width:20px;height:20px;border-radius:50%;display:inline-grid;place-items:center;border:1px solid var(--rule)}
+.phases button:hover{color:var(--ink)}
+.phases button.done{color:var(--ink)} .phases button.done span{background:var(--accent-soft);color:var(--accent);border-color:transparent}
+.phases button.on{color:var(--ink);background:var(--sunk);font-weight:600} .phases button.on span{background:var(--accent);color:var(--surface);border-color:var(--accent)}
+.r.z{border-top:1px dashed var(--muted);margin-top:2px}
+.r.z i{color:var(--accent);font-weight:700}
+.tacc.closed{opacity:.55}
+.tacc.closed .tf{color:var(--accent)}
+details.mini{margin-top:16px}
+details.mini summary{cursor:pointer;font-size:12px;letter-spacing:.1em;text-transform:uppercase;font-weight:600;color:var(--muted);margin-bottom:10px}
+.sumT{border:1px solid var(--ink);border-radius:4px;background:var(--surface);max-width:760px}
+.sumh{font-family:var(--f-disp);font-weight:700;font-size:17px;text-align:center;padding:8px 10px;border-bottom:2px solid var(--ink)}
+.sumb{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+.sumb .col{padding:6px 12px 10px;display:flex;flex-direction:column;gap:2px;min-width:0}
+.sumb .col.d{border-right:2px solid var(--ink)}
+.sumb .ch{font-size:11px;letter-spacing:.08em;text-transform:uppercase;font-weight:600;margin-bottom:4px}
+.sumb .col.d .ch{color:var(--deb)} .sumb .col.c .ch{color:var(--cre);text-align:right}
+.sr{display:flex;justify-content:space-between;gap:10px;align-items:baseline;padding:3px 4px;border-bottom:1px dotted var(--rule);font-size:13.5px;border-radius:3px}
+.sr small{display:block;font-size:10.5px;color:var(--muted);letter-spacing:.03em}
+.sr b{font-family:var(--f-mono);font-variant-numeric:tabular-nums;font-weight:500;white-space:nowrap}
+.sr.res{font-weight:700;border-top:1px solid var(--ink);border-bottom:0}
+.sr.res b{font-weight:700;color:var(--accent)}
+.sr.new{animation:ink 1.4s ease both;--hl:var(--accent-soft)}
+.sr.ph{color:var(--muted)}
+.sumf{display:grid;grid-template-columns:1fr 1fr;border-top:2px solid var(--ink);font-size:13px}
+.sumf span{padding:6px 12px} .sumf span+span{text-align:right;border-left:2px solid var(--ink)}
+.sumf b{font-family:var(--f-mono)}
+.split{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:16px;align-items:start}
+.split .stmt{border-color:var(--rule)}
+.panel{position:sticky;top:calc(env(safe-area-inset-top,0px) + 12px);display:flex;flex-direction:column;gap:12px}
+.panel .ln{font-family:var(--f-disp);font-weight:600;font-size:18px;line-height:1.2;margin-top:6px}
+.panel .lv{font-size:24px;font-weight:600;margin:2px 0 4px}
+.panel .lv.neg{color:var(--cre)}
+.srow{transition:opacity .25s,background .25s}
+.srow.fut{opacity:.3;animation:none}
+.srow.past{animation:none}
+.srow.cur{background:var(--accent-soft);border-radius:3px;outline:1px solid var(--accent);animation:none}
+.pl{display:grid;grid-template-columns:22px 18px minmax(0,1fr) auto;gap:6px;align-items:baseline;padding:2px 0;font-size:13px}
+.pl .st{font-family:var(--f-mono);font-size:11px;color:var(--muted)}
+.pl .s{font-family:var(--f-mono);font-weight:600;font-size:11px;text-align:center;border-radius:3px}
+.pl.T .s{background:var(--deb-soft);color:var(--deb)} .pl.K .s{background:var(--cre-soft);color:var(--cre)}
+.pl small{color:var(--muted)}
+.pl .v{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+.pnet{display:flex;justify-content:space-between;gap:10px;border-top:1px solid var(--rule);margin-top:4px;padding-top:4px;font-size:13px}
+.pnet b{font-family:var(--f-mono)}
+.rule{font-size:12px;color:var(--muted);margin-top:6px}
+.journal small{color:var(--muted);font-size:11px}
+@media (max-width:900px){.split,.sumb{grid-template-columns:minmax(0,1fr)}.sumb .col.d{border-right:0;border-bottom:2px solid var(--ink)}.sumb .col.c .ch{text-align:left}.panel{position:static}.split .panel{order:-1}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="brand">
+    <h1>Számvitel megoldástár</h1>
+    <p>Ormos Mihály példatára alapján · 27 gazdasági esemény lépésről lépésre · minden adat eFt-ban</p>
+  </div>
+  <div class="legend" aria-label="Jelmagyarázat">
+    <span><b style="color:var(--deb)">T</b> Tartozik (bal)</span>
+    <span><b style="color:var(--cre)">K</b> Követel (jobb)</span>
+    <span><i class="dot" style="background:var(--c-eszk)"></i>Eszköz</span>
+    <span><i class="dot" style="background:var(--c-forr)"></i>Kötelezettség</span>
+    <span><i class="dot" style="background:var(--c-tok)"></i>Saját tőke</span>
+    <span><i class="dot" style="background:var(--c-kolt)"></i>Költség, ráfordítás</span>
+    <span><i class="dot" style="background:var(--c-bev)"></i>Bevétel</span>
+  </div>
+</header>
+
+<div class="wrap">
+  <nav aria-label="Példák"><div class="lbl">Példák</div><ol id="nav"></ol></nav>
+  <main id="main"></main>
+</div>
+
+<script>
+const e=(d,c,v)=>[{a:d,s:'T',v},{a:c,s:'K',v}];
+const T=(a,v)=>({a,s:'T',v}), K=(a,v)=>({a,s:'K',v});
+const SE='SEEAÉ (saját előállítású eszközök aktivált értéke)';
+
+const CAT={eszk:['Áruk','Vevők','Pénztár','Műszaki berendezések','Elszámolási betétszámla','Anyagok','Ingatlanok','Egyéb berendezések','Üzleti vagy cégérték','Kísérleti fejlesztés aktivált értéke','Készletek','Beruházások, felújítások','Értékhelyesbítés','Aktív időbeli elhatárolások','Alapítás-átszervezés aktivált értéke','Vagyoni értékű jogok'],
+forr:['Szállítók','Rövid lejáratú hitelek','Hosszú lejáratú kötelezettségek','Jövedelem-elszámolási számla','Tartozások kötvénykibocsátásból','Hosszú lejáratú kölcsönök','Rövid lejáratú kölcsönök','Vevőktől kapott előlegek','Céltartalékok','Passzív időbeli elhatárolások'],
+tok:['Lekötött tartalék','Eredménytartalék','Értékelési tartalék','Jegyzett tőke','Tőketartalék'],
+kolt:['ELÁBÉ','Fizetett kamatok','Anyagköltség','Bérköltség','Egyéb ráfordítások','Személyi jellegű ráfordítások','Értékcsökkenési leírás','Igénybe vett szolgáltatások'],
+bev:['Árbevétel','Egyéb bevételek',SE]};
+const CATN={eszk:'Eszköz',forr:'Kötelezettség',tok:'Saját tőke',kolt:'Ráfordítás',bev:'Bevétel'};
+const catOf=a=>Object.keys(CAT).find(k=>CAT[k].includes(a))||'eszk';
+
+const IL={'01':'01. Belföldi értékesítés nettó árbevétele','I':'I. Értékesítés nettó árbevétele','03':'03. Saját előállítású eszközök aktivált értéke','II':'II. Aktivált saját teljesítmények értéke','III':'III. Egyéb bevételek','05':'05. Anyagköltség','06':'06. Igénybe vett szolgáltatások értéke','08':'08. Eladott áruk beszerzési értéke','IV':'IV. Anyagjellegű ráfordítások','10':'10. Bérköltség','V':'V. Személyi jellegű ráfordítások','VI':'VI. Értékcsökkenési leírás','VII':'VII. Egyéb ráfordítások','A':'A. Üzemi (üzleti) tevékenység eredménye','VIII':'VIII. Pénzügyi műveletek bevételei','19':'19. Fizetett kamatok és kamatjellegű ráfordítások','IX':'IX. Pénzügyi műveletek ráfordításai','B':'B. Pénzügyi műveletek eredménye','C':'C. Adózás előtti eredmény','D':'D. Adózott eredmény'};
+const CL={'I':'I. Működési cash flow','1':'1. Adózás előtti eredmény','2':'2. Elszámolt amortizáció','3':'3. Elszámolt értékvesztés és visszaírás','4':'4. Céltartalék-képzés és -felhasználás különbözete','5':'5. Befektetett eszközök értékesítésének eredménye','6':'6. Szállítói kötelezettség változása','7':'7. Egyéb rövid lejáratú kötelezettség változása','8':'8. Passzív időbeli elhatárolások változása','9':'9. Vevőkövetelés változása','10':'10. Forgóeszközök (vevő és pénzeszköz nélkül) változása','11':'11. Aktív időbeli elhatárolások változása','II':'II. Befektetési cash flow','14':'14. Befektetett eszközök beszerzése','15':'15. Befektetett eszközök eladása','III':'III. Finanszírozási cash flow','17':'17. Részvénykibocsátás, tőkebevonás bevétele','18':'18. Kötvénykibocsátás bevétele','19':'19. Hitel és kölcsön felvétele','24':'24. Hitel és kölcsön törlesztése','IV':'IV. Pénzeszközök változása'};
+
+const EX=[
+{t:'Fűrészgépek: áru és tárgyi eszköz',tag:'Áru',
+task:'Vásároltunk 11 db fűrészgépet 110 eFt/db áron, ebből eladtunk 9 darabot 170.000 Ft-ért, a gépek árának 60%-át a vásárló azonnal befizette pénztárunkba. A megmaradt gépet bevonjuk vállalkozásunk termelési feladatainak ellátásába.',
+steps:[
+{x:'<b>Beszerzés:</b> 11 db × 110 = 1.210. Továbbértékesítés céljából vettük, ezért <b>áru</b>. Fizetésről nincs szó, így szállítói tartozás keletkezik.',p:e('Áruk','Szállítók',1210)},
+{x:'<b>Értékesítés:</b> 9 db × 170 = 1.530. A teljes számlaösszeg árbevétel, függetlenül attól, mennyi pénz folyt be.',p:e('Vevők','Árbevétel',1530)},
+{x:'<b>Részfizetés:</b> a vevő 60%-ot fizet a pénztárba: 1.530 × 0,6 = 918. A vevőkövetelésből 612 marad nyitva.',p:e('Pénztár','Vevők',918)},
+{x:'<b>Eladott áruk beszerzési értéke:</b> 9 db × 110 = 990 kikerül a készletből és ráfordítás lesz.',p:e('ELÁBÉ','Áruk',990)},
+{x:'<b>Átsorolás:</b> a megmaradt 2 db (2 × 110 = 220) a termelést szolgálja, ezért tárgyi eszköz (műszaki berendezés) lesz.',p:e('Műszaki berendezések','Áruk',220)}],
+is:'01:1530,I:1530,08:990,IV:990,A:540,C:540,D:540',
+bsA:'0Befektetett eszközök:220|1Tárgyi eszközök:220|2Műszaki berendezések:220|0Forgóeszközök:1530|1Készletek:0|2Áruk:0|1Követelések:612|2Vevők:612|1Pénzeszközök:918|2Pénztár:918',
+bsP:'0Saját tőke:540|1Adózott eredmény:540|0Kötelezettségek:1210|1Rövid lejáratú kötelezettségek:1210|2Szállítók:1210',
+cf:'I:1138,1:540,6:1210,9:-612,II:-220,14:-220,III:0,IV:918',
+key:'Ugyanaz az eszköz a rendeltetése szerint lehet áru (továbbeladás) vagy tárgyi eszköz (saját használat). A befolyt pénz nem azonos az árbevétellel: a különbség vevőkövetelés.',
+note:'A feladat „a megmaradt gépet” írja, de 11 − 9 = 2 db marad. A megoldás helyesen 220 eFt-tal számol.'},
+
+{t:'Hitelkamat és tőketörlesztés',tag:'Hitel',
+task:'Három évvel ezelőtt felvett bankhitelünk tárgyévi éves kamata 600 eFt volt, melyet 3.000 eFt esedékes tőketörlesztéssel együtt utaltunk át.',
+steps:[
+{x:'<b>Kamat:</b> a 600 eFt a hitel használatának ára, ezért pénzügyi műveletek ráfordítása. Bankszámláról utaltuk.',p:e('Fizetett kamatok','Elszámolási betétszámla',600)},
+{x:'<b>Tőketörlesztés:</b> a tárgyévben esedékes 3.000 eFt a rövid lejáratú kötelezettségek között szerepelt. A törlesztés csak a tartozást csökkenti, <b>nem költség</b>.',p:e('Rövid lejáratú hitelek','Elszámolási betétszámla',3000)}],
+is:'A:0,VIII:0,19:600,IX:600,B:-600,C:-600,D:-600',
+bsA:'0Forgóeszközök:-3600|1Pénzeszközök:-3600|2Elszámolási betétszámla:-3600',
+bsP:'0Saját tőke:-600|1Adózott eredmény:-600|0Kötelezettségek:-3000|1Rövid lejáratú kötelezettségek:-3000|2Rövid lejáratú hitelek:-3000',
+cf:'I:-600,1:-600,II:0,III:-3000,24:-3000,IV:-3600',
+key:'A kamat ráfordítás: hat az eredményre és a működési cash flow-ra. A tőketörlesztés csak mérlegtétel, és a finanszírozási cash flow-ban jelenik meg.'},
+
+{t:'Cégvásárlás, üzleti vagy cégérték',tag:'Cégérték',
+task:'Megvásároltuk és beolvasztottuk vállalkozásunkba egyik nálunk jóval kisebb, de nagyon jó adottságokkal rendelkező versenytársunkat. A megvásárolt cég vagyona 10 db számítógép (egyenként 350 eFt), egy irodaház (25.000 eFt), valamint irodabútorok (6.500 eFt értékben). A vállalkozás 4.000 eFt hosszú lejáratú kötelezettségállományát is átvállaltuk. A cég régi tulajdonosainak az 55.000 eFt-os vételárat átutaltuk.',
+steps:[
+{x:'<b>Átvett eszközök:</b> irodaház 25.000 (ingatlan), 10 × 350 = 3.500 számítógép (műszaki berendezés), bútor 6.500 (egyéb berendezés). Összesen 35.000.',p:[T('Ingatlanok',25000),T('Műszaki berendezések',3500),T('Egyéb berendezések',6500)]},
+{x:'<b>Átvállalt adósság:</b> a 4.000 hosszú lejáratú kötelezettség hozzánk kerül. Az átvett nettó vagyon: 35.000 − 4.000 = <b>31.000</b>.',p:[K('Hosszú lejáratú kötelezettségek',4000)]},
+{x:'<b>Vételár kifizetése:</b> 55.000 eFt-ot utaltunk a régi tulajdonosoknak.',p:[K('Elszámolási betétszámla',55000)]},
+{x:'<b>Üzleti vagy cégérték:</b> a vételár és a nettó vagyon különbsége: 55.000 − 31.000 = <b>24.000</b>. Ezt fizettük a „jó adottságokért”; immateriális jószágként aktiváljuk. Ezzel T (59.000) = K (59.000).',p:[T('Üzleti vagy cégérték',24000)]}],
+is:'A:0,B:0,C:0,D:0',
+bsA:'0Befektetett eszközök:59000|1Immateriális javak:24000|2Üzleti vagy cégérték:24000|1Tárgyi eszközök:35000|2Ingatlanok:25000|2Műszaki berendezések:3500|2Egyéb berendezések:6500|0Forgóeszközök:-55000|1Pénzeszközök:-55000|2Elszámolási betétszámla:-55000',
+bsP:'0Kötelezettségek:4000|1Hosszú lejáratú kötelezettségek:4000',
+cf:'I:0,1:0,II:-59000,14:-59000,III:4000,19:4000,IV:-55000',
+key:'Cégvásárlásnál a vételár és az átvett nettó eszközérték különbsége az üzleti vagy cégérték: 55.000 − (35.000 − 4.000) = 24.000.',
+note:'A megoldókulcs az átvállalt adósságot finanszírozási beáramlásként (+4.000), a teljes eszközértéket beruházásként (−59.000) mutatja. Valódi pénzmozgás csak a −55.000; ez tankönyvi egyszerűsítés.'},
+
+{t:'Körfűrészek: áru és saját használat',tag:'Áru',
+task:'Vásároltunk 12 darab körfűrészt 140.000 Ft/db áron (a szállítót kifizettük), melyek közül kettőt vállalkozásunk termeléséhez használunk majd, míg 10 darabot értékesítettünk egyenként 180 eFt-ért (a vevő a kibocsátott számla 50%-át egyenlítette ki).',
+steps:[
+{x:'<b>Beszerzés:</b> 12 db × 140 = 1.680 áruként, a szállító számlája alapján.',p:e('Áruk','Szállítók',1680)},
+{x:'<b>Szállító kifizetése</b> a pénztárból: a tartozás megszűnik.',p:e('Szállítók','Pénztár',1680)},
+{x:'<b>Értékesítés:</b> 10 db × 180 = 1.800 árbevétel.',p:e('Vevők','Árbevétel',1800)},
+{x:'<b>Részfizetés:</b> a vevő a számla 50%-át, 900-at fizeti meg.',p:e('Pénztár','Vevők',900)},
+{x:'<b>ELÁBÉ:</b> 10 db × 140 = 1.400 kivezetése a készletből.',p:e('ELÁBÉ','Áruk',1400)},
+{x:'<b>Átsorolás:</b> a 2 saját használatú gép (2 × 140 = 280) tárgyi eszköz.',p:e('Műszaki berendezések','Áruk',280)}],
+is:'01:1800,I:1800,08:1400,IV:1400,A:400,C:400,D:400',
+bsA:'0Befektetett eszközök:280|1Tárgyi eszközök:280|2Műszaki berendezések:280|0Forgóeszközök:120|1Készletek:0|2Áruk:0|1Követelések:900|2Vevők:900|1Pénzeszközök:-780|2Pénztár:-780',
+bsP:'0Saját tőke:400|1Adózott eredmény:400',
+cf:'I:-500,1:400,9:-900,II:-280,14:-280,III:0,IV:-780',
+key:'Az áru beszerzése önmagában csak mérlegtétel; költség (ELÁBÉ) akkor lesz belőle, amikor eladjuk. A pénzhatás: −1.680 + 900 = −780.'},
+
+{t:'Kísérleti fejlesztés aktiválása',tag:'Aktiválás',
+task:'A fejlesztési főmérnök javaslatát elfogadjuk, és a tárgyévben felmerült 7.000 eFt értékű anyagjellegű ráfordítást, valamint 3.000 eFt személyi jellegű ráfordítást (még nem fizettük ki munkavállalóinknak) aktiváljuk, elvárva, hogy a fejlesztés költségei 5 éven belül megtérüljenek.',
+steps:[
+{x:'<b>Anyagfelhasználás:</b> 7.000 anyag kerül a fejlesztésbe; költségnemen anyagköltség.',p:e('Anyagköltség','Anyagok',7000)},
+{x:'<b>Bérköltség:</b> 3.000, még nem fizettük ki, ezért kötelezettség a dolgozók felé (jövedelem-elszámolási számla).',p:e('Bérköltség','Jövedelem-elszámolási számla',3000)},
+{x:'<b>Aktiválás:</b> a fejlesztés várhatóan megtérül, így immateriális jószág lesz. A saját előállítású eszközök aktivált értéke (SEEAÉ) bevételjellegű tétel, amely a 10.000 költséget pontosan ellentételezi.',p:e('Kísérleti fejlesztés aktivált értéke',SE,10000)},
+{x:'<b>Lekötött tartalék:</b> az aktivált kísérleti fejlesztés értékével az eredménytartalékból lekötött tartalékot kell képezni (osztalékként nem fizethető ki). A saját tőke összege nem változik.',p:e('Eredménytartalék','Lekötött tartalék',10000)}],
+is:'03:10000,II:10000,05:7000,IV:7000,10:3000,V:3000,A:0,D:0',
+bsA:'0Befektetett eszközök:10000|1Immateriális javak:10000|2Kísérleti fejlesztés aktivált értéke:10000|0Forgóeszközök:-7000|1Készletek:-7000|2Anyagok:-7000',
+bsP:'0Saját tőke:0|1Eredménytartalék:-10000|1Lekötött tartalék:10000|0Kötelezettségek:3000|1Rövid lejáratú kötelezettségek:3000|2Jövedelem-elszámolás:3000',
+cf:'I:10000,1:0,7:3000,10:7000,II:-10000,14:-10000,III:0,IV:0',
+key:'A SEEAÉ semlegesíti a felmerült költségeket, így az eredményhatás 0. A kísérleti fejlesztés értékével lekötött tartalékot kell képezni.'},
+
+{t:'Készlet értékvesztése és visszaírása',tag:'Értékvesztés',
+task:'Készleteinkre károsodás miatt tárgyév júniusában 5.000 eFt értékvesztést számoltunk el. Az év végi állapotfelmérés és az értékesítési tapasztalatok alapján megállapítom, hogy az elszámolt értékvesztés 1.500 eFt-tal több volt az indokoltnál.',
+steps:[
+{x:'<b>Júniusi értékvesztés:</b> a károsodás miatt a készlet értéke 5.000-rel csökken; egyéb ráfordítás.',p:e('Egyéb ráfordítások','Készletek',5000)},
+{x:'<b>Év végi visszaírás:</b> a túlzott 1.500-at visszaírjuk; egyéb bevétel. Nettó hatás: −3.500.',p:e('Készletek','Egyéb bevételek',1500)}],
+is:'III:1500,VII:5000,A:-3500,C:-3500,D:-3500',
+bsA:'0Forgóeszközök:-3500|1Készletek:-3500',
+bsP:'0Saját tőke:-3500|1Adózott eredmény:-3500',
+cf:'I:0,1:-3500,3:3500,II:0,III:0,IV:0',
+key:'Az értékvesztés és a visszaírás bruttó módon jelenik meg (ráfordítás 5.000, bevétel 1.500). Pénzmozgás nincs, ezért a cash flow-ban a 3.500-at vissza kell adni.'},
+
+{t:'Ingatlan értékvesztésének visszaírása',tag:'Értékvesztés',
+task:'Tárgyévet megelőző évben beázott a raktárunk és megrongálódott. Veszteséget könyveltünk el 10.000 eFt értékben. A tárgyévben megállapítottam, hogy a kár csak 6.000 eFt volt.',
+steps:[
+{x:'<b>Előző év:</b> a 10.000 terven felüli leírás az előző év eredményét csökkentette. A tárgyévi kimutatásokat nem érinti.',p:[]},
+{x:'<b>Visszaírás:</b> a túlzott rész 10.000 − 6.000 = 4.000. Az ingatlan értéke ennyivel nő; egyéb bevétel.',p:e('Ingatlanok','Egyéb bevételek',4000)}],
+is:'III:4000,A:4000,B:0,C:4000,D:4000',
+bsA:'0Befektetett eszközök:4000|1Tárgyi eszközök:4000|2Ingatlanok:4000',
+bsP:'0Saját tőke:4000|1Adózott eredmény:4000',
+cf:'I:0,1:4000,3:-4000,II:0,III:0,IV:0',
+key:'A korábban túlzottan elszámolt értékvesztés egyéb bevételként visszaírható; a tárgyévben csak a visszaírás hat.'},
+
+{t:'Elmaradt árueladás',tag:'Áru',
+task:'Eddig még nem számoltunk el 1.000 eFt bekerülési értéken nyilvántartott árueladást. Az eladási ár 1.500 eFt. A vevő a számla felét egyenlítette ki.',
+steps:[
+{x:'<b>Árbevétel:</b> a teljes 1.500 eladási ár.',p:e('Vevők','Árbevétel',1500)},
+{x:'<b>Részfizetés:</b> a vevő a felét, 750-et fizeti meg.',p:e('Pénztár','Vevők',750)},
+{x:'<b>ELÁBÉ:</b> az áru 1.000-es bekerülési értéke kikerül a készletből.',p:e('ELÁBÉ','Áruk',1000)}],
+is:'01:1500,I:1500,08:1000,IV:1000,A:500,B:0,C:500,D:500',
+bsA:'0Forgóeszközök:500|1Készletek:-1000|2Áruk:-1000|1Követelések:750|2Vevők:750|1Pénzeszközök:750|2Pénztár:750',
+bsP:'0Saját tőke:500|1Adózott eredmény:500',
+cf:'I:750,1:500,9:-750,10:1000,II:0,III:0,IV:750',
+key:'Az árbevétel a teljes számlaösszeg, nem a befolyt pénz; az ELÁBÉ a bekerülési érték. Eredmény: 1.500 − 1.000 = 500.'},
+
+{t:'Irodaépület felújítása saját erőből',tag:'Aktiválás',
+task:'Tárgyévben megkezdtük az azt megelőző évben beázott irodaépületünk felújítását. A káresemény miatt 3.500 eFt terven felüli értékcsökkenési leírást számoltunk el. Az önerős felújításra eddig 4.600 eFt költséget számoltunk el (3.000 eFt anyagjellegű ráfordítás, 1.200 eFt személyi jellegű ráfordítás – amit már kifizettünk – és 400 eFt értékcsökkenési leírás), de a felújítás még nem fejeződött be.',
+steps:[
+{x:'<b>Előző év:</b> a 3.500 terven felüli értékcsökkenés az előző évet terhelte, a tárgyévben nincs vele teendő.',p:[]},
+{x:'<b>Anyag:</b> 3.000 anyagfelhasználás a felújításhoz.',p:e('Anyagköltség','Anyagok',3000)},
+{x:'<b>Bér:</b> 1.200 személyi jellegű ráfordítás, már kifizetve a pénztárból.',p:e('Személyi jellegű ráfordítások','Pénztár',1200)},
+{x:'<b>Értékcsökkenés:</b> a felújításhoz használt gépek 400 értékcsökkenése.',p:e('Értékcsökkenési leírás','Műszaki berendezések',400)},
+{x:'<b>Aktiválás:</b> a 4.600 költséget aktiváljuk. Mivel a felújítás <b>még nem kész</b>, befejezetlen beruházásként (beruházások, felújítások) szerepel. Eredményhatás: 0.',p:e('Beruházások, felújítások',SE,4600)}],
+is:'03:4600,II:4600,IV:3000,V:1200,VI:400,A:0,D:0',
+bsA:'0Befektetett eszközök:4200|1Tárgyi eszközök:4200|2Beruházások, felújítások:4600|2Műszaki berendezések:-400|0Forgóeszközök:-4200|1Készletek:-3000|2Anyagok:-3000|1Pénzeszközök:-1200|2Pénztár:-1200',
+bsP:'0Saját tőke:0',
+cf:'I:3400,1:0,2:400,10:3000,II:-4600,14:-4600,III:0,IV:-1200',
+key:'Saját kivitelezésnél a költségnemeken elszámolt összegeket aktiváljuk. Amíg a munka nem kész, befejezetlen beruházásként szerepel. A pénzhatás csak a kifizetett bér (−1.200).'},
+
+{t:'Garanciális céltartalék felhasználása',tag:'Céltartalék',
+task:'Társaságunknál tárgyévben 5.000 eFt anyagköltséget számoltunk el, ennek 20%-át az előző évben garanciális javításokra képzett 8.000 eFt-os céltartalékból finanszíroztuk. Ezen alap terhére 2.500 eFt-ot munkavállalóink bérköltségére, valamint a javításokhoz használt tárgyi eszközök értékcsökkenési leírására további 1.000 eFt-ot számoltunk el a garanciális idő lejártáig.',
+steps:[
+{x:'<b>Anyagköltség:</b> 5.000.',p:e('Anyagköltség','Anyagok',5000)},
+{x:'<b>Bérköltség:</b> 2.500, amelyet kifizettünk bankszámláról (a jövedelem-elszámolási számlán keresztül).',p:[...e('Bérköltség','Jövedelem-elszámolási számla',2500),...e('Jövedelem-elszámolási számla','Elszámolási betétszámla',2500)]},
+{x:'<b>Értékcsökkenés:</b> 1.000 a javításhoz használt eszközökre.',p:e('Értékcsökkenési leírás','Műszaki berendezések',1000)},
+{x:'<b>Céltartalék megszüntetése:</b> a garanciális idő lejárt, ezért a teljes 8.000-es céltartalékot fel kell oldani egyéb bevételként. Ez ellentételezi a felmerült költségeket.',p:e('Céltartalékok','Egyéb bevételek',8000)}],
+is:'III:8000,05:5000,IV:5000,10:2500,V:2500,VI:1000,A:-500,D:-500',
+bsA:'0Befektetett eszközök:-1000|1Tárgyi eszközök:-1000|2Műszaki berendezések:-1000|0Forgóeszközök:-7500|1Készletek:-5000|2Anyagok:-5000|1Pénzeszközök:-2500|2Elszámolási betétszámla:-2500',
+bsP:'0Saját tőke:-500|1Adózott eredmény:-500|0Céltartalékok:-8000',
+cf:'I:-2500,1:-500,2:1000,4:-8000,10:5000,II:0,III:0,IV:-2500',
+key:'A céltartalék felhasználása és felszabadítása egyéb bevétel, amely a tényleges költségeket ellentételezi. Mivel ennek nincs pénzhatása, a cash flow-ban korrigálni kell.',
+note:'A szöveg 20%-os finanszírozásról szól, a megoldás viszont a teljes 8.000-es céltartalékot feloldja, mert a garanciális idő lejárt. A levezetés a megoldókulcsot követi.'},
+
+{t:'Kötvénykibocsátás',tag:'Kötvény',
+task:'Vállalkozásunk tárgyév január 1-én 60.000 eFt névértékű kötvényt bocsátott ki 10 éves lejárattal. A kötvény kamata évi 15%. A kötvény tőketörlesztése az 5. évben kezdődik, a kamatok viszont már az első évtől esedékesek.',
+steps:[
+{x:'<b>Kibocsátás:</b> 60.000 folyik be. Tőketörlesztés csak az 5. évtől, ezért a teljes összeg hosszú lejáratú kötelezettség.',p:e('Elszámolási betétszámla','Tartozások kötvénykibocsátásból',60000)},
+{x:'<b>Éves kamat:</b> 60.000 × 15% = 9.000, a tárgyévben esedékes és kifizetett pénzügyi ráfordítás.',p:e('Fizetett kamatok','Elszámolási betétszámla',9000)}],
+is:'A:0,VIII:0,19:9000,IX:9000,B:-9000,C:-9000,D:-9000',
+bsA:'0Forgóeszközök:51000|1Pénzeszközök:51000|2Elszámolási betétszámla:51000',
+bsP:'0Saját tőke:-9000|1Adózott eredmény:-9000|0Kötelezettségek:60000|1Hosszú lejáratú kötelezettségek:60000|2Tartozások kötvénykibocsátásból:60000',
+cf:'I:-9000,1:-9000,II:0,III:60000,18:60000,IV:51000',
+key:'A kötvénykibocsátás pénzbeáramlás és hosszú lejáratú kötelezettség (finanszírozási CF). A kamat ráfordítás, amely a működési CF-et rontja.'},
+
+{t:'Gépsor eladása értékhelyesbítéssel',tag:'Eszközkivezetés',
+task:'Értékesítjük egyik elavult gépsorunkat 22.000 eFt-ért. A gépsor bekerülési értéke évekkel ezelőtt 40.000 eFt volt, amelyből terv szerinti értékcsökkenési leírásként 16.000 eFt-ot számoltunk el. A tárgyévet megelőző évi értékelésünk szerint a gép könyv szerinti értéke a piaci érték alatt volt 3.000 eFt-tal, és vállalkozásunk élt a felértékelés lehetőségével.',
+steps:[
+{x:'<b>Eladás:</b> a tárgyi eszköz értékesítése nem árbevétel, hanem <b>egyéb bevétel</b> (22.000). A vevő még nem fizetett.',p:e('Vevők','Egyéb bevételek',22000)},
+{x:'<b>Könyv szerinti érték kivezetése:</b> 40.000 − 16.000 = 24.000 egyéb ráfordítás.',p:e('Egyéb ráfordítások','Műszaki berendezések',24000)},
+{x:'<b>Értékhelyesbítés kivezetése:</b> a 3.000 felértékelés az értékelési tartalékkal szemben szűnik meg, eredményhatás nélkül.',p:e('Értékelési tartalék','Értékhelyesbítés',3000)}],
+is:'III:22000,VII:24000,A:-2000,C:-2000,D:-2000',
+bsA:'0Befektetett eszközök:-27000|1Tárgyi eszközök:-27000|2Műszaki berendezések:-24000|2Értékhelyesbítés:-3000|0Forgóeszközök:22000|1Követelések:22000|2Vevők:22000',
+bsP:'0Saját tőke:-5000|1Értékelési tartalék:-3000|1Adózott eredmény:-2000',
+cf:'I:-22000,1:-2000,5:2000,9:-22000,II:22000,15:22000,III:0,IV:0',
+key:'Eszköz eladásakor a bevétel az eladási ár, a ráfordítás a könyv szerinti érték (veszteség: 2.000). Az értékhelyesbítés a saját tőkén belül szűnik meg.',
+note:'A megoldókulcs a befektetési CF-ben +22.000 eladást, a működésiben −22.000 vevőváltozást mutat. A nettó pénzhatás 0, mert a vevő még nem fizetett.'},
+
+{t:'Céltartalék felhasználása és felszabadítása',tag:'Céltartalék',
+task:'Garanciális javításokra a tárgyévet megelőző év végén 7.000 eFt céltartalékot képeztünk, ebből még az évben 1.000 eFt-ot használtunk fel. Tárgyévben a garanciális idő lejártáig további 4.000 eFt-ot kellett felhasználnunk (anyagok 2.500 eFt, munkavállalók bére – még kiegyenlítetlen – 1.500 eFt).',
+steps:[
+{x:'<b>Nyitó céltartalék:</b> 7.000 − 1.000 (előző évi felhasználás) = <b>6.000</b>.',p:[]},
+{x:'<b>Anyag:</b> 2.500 felhasználás a javításokhoz.',p:e('Anyagköltség','Anyagok',2500)},
+{x:'<b>Bér:</b> 1.500, még kiegyenlítetlen.',p:e('Bérköltség','Jövedelem-elszámolási számla',1500)},
+{x:'<b>Céltartalék megszüntetése:</b> a garancia lejárt, így a teljes 6.000 felszabadul egyéb bevételként (4.000 felhasználás + 2.000 fel nem használt rész).',p:e('Céltartalékok','Egyéb bevételek',6000)}],
+is:'III:6000,05:2500,IV:2500,10:1500,V:1500,A:2000,B:0,C:2000,D:2000',
+bsA:'0Forgóeszközök:-2500|1Készletek:-2500|2Anyagok:-2500',
+bsP:'0Saját tőke:2000|1Adózott eredmény:2000|0Céltartalékok:-6000|0Kötelezettségek:1500|1Rövid lejáratú kötelezettségek:1500|2Egyéb rövid lejáratú kötelezettségek:1500',
+cf:'I:0,1:2000,4:-6000,7:1500,10:2500,II:0,III:0,IV:0',
+key:'A garancia lejártakor a céltartalékot teljesen fel kell oldani. A fel nem használt 2.000 adja a pozitív eredményt.'},
+
+{t:'Továbbeladásra vett szoftver',tag:'Készlet',
+task:'Ez év decemberében vásároltunk egy szoftvert, amellyel az éves beszámolót kívánjuk összeállítani. A szoftver bekerülési értéke 1.400 eFt volt, amit a szállítóval kötött szerződés alapján 60 nap múlva (még a mérlegkészítést megelőzően) utalunk át. A szoftvert a beszámoló elkészítése után vállalkozásunk értékesíteni fogja várhatóan 1.650 eFt-os áron.',
+steps:[
+{x:'<b>Minősítés:</b> a szoftver nem szolgálja tartósan a tevékenységet (eladjuk), ezért <b>készlet</b>, nem befektetett eszköz. Bekerülési értéken (1.400) vesszük nyilvántartásba; a várható 1.650-es eladási ár nem számít. A fizetés a mérlegfordulónap után történik.',p:e('Anyagok','Szállítók',1400)}],
+is:'A:0,B:0,C:0,D:0',
+bsA:'0Forgóeszközök:1400|1Készletek:1400|2Anyagok:1400',
+bsP:'0Kötelezettségek:1400|1Rövid lejáratú kötelezettségek:1400|2Szállítók:1400',
+cf:'I:0,1:0,6:1400,10:-1400,II:0,III:0,IV:0',
+key:'A rendeltetés dönt: ami nem tartósan szolgálja a tevékenységet, az forgóeszköz. A várható eladási ár nem befolyásolja a bekerülési értéket.'},
+
+{t:'Céltartalék-képzés garanciára',tag:'Céltartalék',
+task:'Megállapítjuk, hogy a tárgyévben eladott termékeinkre – garanciavállalás miatt – még a tárgyévet követő évben várhatóan 4.000 eFt költségünk lesz.',
+steps:[
+{x:'<b>Céltartalék-képzés:</b> várható, becsülhető jövőbeni kötelezettség a tárgyévi értékesítéshez kapcsolódva. Egyéb ráfordítással szemben képezzük.',p:e('Egyéb ráfordítások','Céltartalékok',4000)}],
+is:'VII:4000,A:-4000,B:0,C:-4000,D:-4000',
+bsA:'',
+bsP:'0Saját tőke:-4000|1Adózott eredmény:-4000|0Céltartalékok:4000',
+cf:'I:0,1:-4000,4:4000,II:0,III:0,IV:0',
+key:'A céltartalék a költséget abba az évbe teszi, amelyben az árbevétel keletkezett. Pénzmozgás nincs, a CF-ben visszaadjuk.'},
+
+{t:'Részvénykibocsátás ázsióval',tag:'Saját tőke',
+task:'Vállalkozásunk 100.000 db részvényt bocsátott ki. A jegyzési árfolyam 1.200 Ft volt, míg a részvények névértéke 1.000 Ft.',
+steps:[
+{x:'<b>Névérték:</b> 100.000 db × 1.000 Ft = 100.000 eFt jegyzett tőke.',p:e('Elszámolási betétszámla','Jegyzett tőke',100000)},
+{x:'<b>Ázsió:</b> a névérték feletti rész 100.000 × 200 Ft = 20.000 eFt tőketartalék. Összesen 120.000 folyt be.',p:e('Elszámolási betétszámla','Tőketartalék',20000)}],
+is:'A:0,B:0,C:0,D:0',
+bsA:'0Forgóeszközök:120000|1Pénzeszközök:120000|2Elszámolási betétszámla:120000',
+bsP:'0Saját tőke:120000|1Jegyzett tőke:100000|1Tőketartalék:20000',
+cf:'I:0,1:0,II:0,III:120000,17:120000,IV:120000',
+key:'Névérték → jegyzett tőke, névérték feletti rész → tőketartalék. Eredményhatás nincs, a pénz a finanszírozási CF-ben jelenik meg.'},
+
+{t:'Utólagos aktiválás: kísérleti fejlesztés',tag:'Aktiválás',
+task:'Megállapítjuk, hogy az eddig már elszámolt gazdasági eseményeken (költségeken) kívül aktiválnunk kell kísérleti fejlesztés értékeként 2.000 eFt-ot. (Ez kizárólag munkavállalóinknak már kifizetett bérköltségéből állt össze.)',
+steps:[
+{x:'<b>Bérköltség:</b> a megoldás a kifizetett 2.000 bért tárgyévi pénzkiáramlásként szerepelteti.',p:e('Bérköltség','Elszámolási betétszámla',2000)},
+{x:'<b>Aktiválás:</b> a 2.000 kísérleti fejlesztésként immateriális jószág; a SEEAÉ ellentételezi a bérköltséget.',p:e('Kísérleti fejlesztés aktivált értéke',SE,2000)},
+{x:'<b>Lekötött tartalék:</b> az aktivált érték összegében az eredménytartalékból.',p:e('Eredménytartalék','Lekötött tartalék',2000)}],
+is:'03:2000,II:2000,10:2000,V:2000,A:0,B:0,C:0,D:0',
+bsA:'0Befektetett eszközök:2000|1Immateriális javak:2000|2Kísérleti fejlesztés aktivált értéke:2000|0Forgóeszközök:-2000|1Pénzeszközök:-2000|2Elszámolási betétszámla:-2000',
+bsP:'0Saját tőke:0|1Eredménytartalék:-2000|1Lekötött tartalék:2000',
+cf:'I:0,1:0,II:-2000,14:-2000,III:0,IV:-2000',
+key:'Aktiváláskor a SEEAÉ ellentételezi a költséget, kísérleti fejlesztésnél pedig lekötött tartalék is kell. A pénzkiáramlás beruházásként jelenik meg.',
+note:'Ha a bért már korábban elszámoltuk és kifizettük, a tárgyévi tétel csak az aktiválás és a lekötés. A megoldókulcs a bérfizetést is ide számítja (−2.000 pénzhatás).'},
+
+{t:'Kamatmentes kölcsön anyavállalattól',tag:'Kölcsön',
+task:'December 31-én kamatmentes kölcsönként 10 millió Ft-ot kapunk anyavállalatunktól. A pénz megérkezett a bankszámlára. Visszafizetési kötelezettség a következő években évi 2-2 millió Ft.',
+steps:[
+{x:'<b>Hosszú lejáratú rész:</b> a 2. évtől esedékes 8.000.',p:e('Elszámolási betétszámla','Hosszú lejáratú kölcsönök',8000)},
+{x:'<b>Rövid lejáratú rész:</b> a következő évben esedékes 2.000 a mérlegben rövid lejáratú kötelezettség. Kamatmentes, így ráfordítás nincs.',p:e('Elszámolási betétszámla','Rövid lejáratú kölcsönök',2000)}],
+is:'A:0,B:0,C:0,D:0',
+bsA:'0Forgóeszközök:10000|1Pénzeszközök:10000|2Elszámolási betétszámla:10000',
+bsP:'0Kötelezettségek:10000|1Hosszú lejáratú kötelezettségek:8000|2Hosszú lejáratú kölcsönök:8000|1Rövid lejáratú kötelezettségek:2000|2Rövid lejáratú kölcsönök:2000',
+cf:'I:0,1:0,II:0,III:10000,19:10000,IV:10000',
+key:'A kölcsönt lejárat szerint bontjuk: a következő évben esedékes rész rövid, a többi hosszú lejáratú.',
+note:'A feladatlap „előző év december 31.”, a megoldás „ez év december 31.” időpontot ír. A levezetés a megoldás feltételezését követi (tárgyévi felvétel).'},
+
+{t:'Előre fizetett bérleti díj',tag:'Elhatárolás',
+task:'Társaságunk tárgyév januárjában szerződést kötött egy irodaházzal, amelyben megállapodott egy 100 m²-es iroda bérlésében. A bérleti díj évi 50 eFt/m². A szerződés értelmében a bérleti díjat három évre előre megfizettük.',
+steps:[
+{x:'<b>Díj:</b> 100 m² × 50 = 5.000/év, 3 évre 15.000. Számla és kifizetés bankszámláról.',p:[...e('Igénybe vett szolgáltatások','Szállítók',15000),...e('Szállítók','Elszámolási betétszámla',15000)]},
+{x:'<b>Aktív időbeli elhatárolás:</b> csak a tárgyévre jutó 5.000 költség. A következő két év díját (10.000) átvisszük.',p:e('Aktív időbeli elhatárolások','Igénybe vett szolgáltatások',10000)}],
+is:'06:5000,IV:5000,A:-5000,B:0,C:-5000,D:-5000',
+bsA:'0Forgóeszközök:-15000|1Pénzeszközök:-15000|2Elszámolási betétszámla:-15000|0Aktív időbeli elhatárolások:10000',
+bsP:'0Saját tőke:-5000|1Adózott eredmény:-5000',
+cf:'I:-15000,1:-5000,11:-10000,II:0,III:0,IV:-15000',
+key:'Csak a tárgyévre jutó díj költség; az előre fizetett jövőbeli rész aktív időbeli elhatárolás.'},
+
+{t:'Átszervezés aktiválása',tag:'Aktiválás',
+task:'Vállalkozásunk szervezeti felépítését egy tanácsadó cég javaslatára megváltoztattuk. A tanácsadó ígérete szerint a felmerült költségek – anyagköltség: 1.500 eFt, munkabér: 5.000 eFt – öt éven belül megtérülnek. A tanácsadásért 3.000 eFt-ot számlázott ki, amelyet még nem fizettünk ki.',
+steps:[
+{x:'<b>Anyag:</b> 1.500.',p:e('Anyagköltség','Anyagok',1500)},
+{x:'<b>Bér:</b> 5.000, még nem fizettük ki.',p:e('Bérköltség','Jövedelem-elszámolási számla',5000)},
+{x:'<b>Tanácsadói díj:</b> 3.000 igénybe vett szolgáltatás, kifizetetlen.',p:e('Igénybe vett szolgáltatások','Szállítók',3000)},
+{x:'<b>Aktiválás:</b> 1.500 + 5.000 + 3.000 = 9.500 alapítás-átszervezés aktivált értékeként, mert a megtérülés várható.',p:e('Alapítás-átszervezés aktivált értéke',SE,9500)},
+{x:'<b>Lekötött tartalék:</b> az aktivált érték összegében.',p:e('Eredménytartalék','Lekötött tartalék',9500)}],
+is:'03:9500,II:9500,05:1500,06:3000,IV:4500,10:5000,V:5000,A:0,D:0',
+bsA:'0Befektetett eszközök:9500|1Immateriális javak:9500|2Alapítás-átszervezés aktivált értéke:9500|0Forgóeszközök:-1500|1Készletek:-1500|2Anyagok:-1500',
+bsP:'0Saját tőke:0|1Eredménytartalék:-9500|1Lekötött tartalék:9500|0Kötelezettségek:8000|1Rövid lejáratú kötelezettségek:8000|2Szállítók:3000|2Egyéb rövid lejáratú kötelezettségek:5000',
+cf:'I:9500,1:0,6:3000,7:5000,10:1500,II:-9500,14:-9500,III:0,IV:0',
+key:'A költségek aktiválásával az eredményhatás 0. Pénz nem mozdul, de a kötelezettségek 8.000-rel nőnek.',
+note:'A megoldókulcs CF-jében elírás van (II. = 0, III. = 9.500). Helyesen a −9.500 a befektetési CF, a finanszírozási 0; itt így szerepel. A 2016-tól hatályos Szt. már nem ismeri az alapítás-átszervezés aktivált értéke mérlegsort; a példatár a korábbi szabályozás szerint számol.'},
+
+{t:'Térítés nélkül átvett eszköz',tag:'Elhatárolás',
+task:'Társaságunk térítés nélkül átvett két darab antik asztali lámpát, amelyek értéke összesen 500 eFt. Az eszközöket az átvételt követő második hónapban értékesítettük 400 eFt-ért.',
+steps:[
+{x:'<b>Átvétel:</b> az eszköz értéke nem azonnal bevétel, hanem passzív időbeli elhatárolás. Bevétellé akkor válik, amikor az eszköz kikerül.',p:e('Áruk','Passzív időbeli elhatárolások',500)},
+{x:'<b>Eladás:</b> 400 árbevétel, készpénzben befolyt.',p:[...e('Vevők','Árbevétel',400),...e('Pénztár','Vevők',400)]},
+{x:'<b>ELÁBÉ:</b> az 500-as nyilvántartási érték kikerül.',p:e('ELÁBÉ','Áruk',500)},
+{x:'<b>Elhatárolás feloldása:</b> az eszköz kikerült, ezért az 500 egyéb bevétel lesz. Eredmény: 400 + 500 − 500 = 400.',p:e('Passzív időbeli elhatárolások','Egyéb bevételek',500)}],
+is:'01:400,I:400,III:500,08:500,IV:500,A:400,B:0,C:400,D:400',
+bsA:'0Forgóeszközök:400|1Készletek:0|1Követelések:0|1Pénzeszközök:400|2Pénztár:400',
+bsP:'0Saját tőke:400|1Adózott eredmény:400',
+cf:'I:400,1:400,II:0,III:0,IV:400',
+key:'Térítés nélkül átvett eszköz értéke passzív időbeli elhatárolás, amely az eszköz kikerülésekor (itt eladáskor) egyéb bevétellé válik.'},
+
+{t:'Utólag fizetendő bérleti díj',tag:'Elhatárolás',
+task:'Tárgyév első napján kibéreltünk egy raktárhelyiséget. A szerződés értelmében a bérleti díjat csak a harmadik év végén kell megfizetnünk, amelynek értéke 2.500 eFt évente.',
+steps:[
+{x:'<b>Költség elhatárolása:</b> a tárgyévre jutó 2.500 bérleti díj a tárgyév költsége, bár csak a 3. év végén fizetjük. Passzív időbeli elhatárolással számoljuk el.',p:e('Igénybe vett szolgáltatások','Passzív időbeli elhatárolások',2500)}],
+is:'06:2500,IV:2500,A:-2500,B:0,C:-2500,D:-2500',
+bsA:'',
+bsP:'0Saját tőke:-2500|1Adózott eredmény:-2500|0Passzív időbeli elhatárolások:2500',
+cf:'I:0,1:-2500,8:2500,II:0,III:0,IV:0',
+key:'A költség abba az évbe tartozik, amelyben felmerül, akkor is, ha később fizetjük. Pénzmozgás nincs.'},
+
+{t:'Értékesítési rendszer fejlesztése',tag:'Aktiválás',
+task:'Tárgyévben társas vállalkozásunk tanácsadó cég segítségét kérte értékesítési technikáinak fejlesztéséhez. A tanácsadó cég munkájának ellentételezésére 10.000 eFt-ot számlázott ki, amelyet teljes egészében megfizettünk. A javaslatok megvalósításakor további költségek merültek fel: anyagköltség 2.500 eFt, munkabér 8.000 eFt. A tanácsadó állítása szerint az új rendszer 4 év alatt térül meg.',
+steps:[
+{x:'<b>Tanácsadói díj:</b> 10.000 igénybe vett szolgáltatás, kifizetve.',p:[...e('Igénybe vett szolgáltatások','Szállítók',10000),...e('Szállítók','Elszámolási betétszámla',10000)]},
+{x:'<b>Anyag:</b> 2.500 a készletből.',p:e('Anyagköltség','Anyagok',2500)},
+{x:'<b>Bér:</b> 8.000, kifizetve bankszámláról.',p:[...e('Bérköltség','Jövedelem-elszámolási számla',8000),...e('Jövedelem-elszámolási számla','Elszámolási betétszámla',8000)]},
+{x:'<b>Aktiválás:</b> 10.000 + 2.500 + 8.000 = 20.500, a megtérülés várható.',p:e('Alapítás-átszervezés aktivált értéke',SE,20500)},
+{x:'<b>Lekötött tartalék</b> az aktivált érték összegében.',p:e('Eredménytartalék','Lekötött tartalék',20500)}],
+is:'03:20500,II:20500,05:2500,06:10000,IV:12500,10:8000,V:8000,A:0,D:0',
+bsA:'0Befektetett eszközök:20500|1Immateriális javak:20500|2Alapítás-átszervezés aktivált értéke:20500|0Forgóeszközök:-20500|1Készletek:-2500|2Anyagok:-2500|1Pénzeszközök:-18000|2Elszámolási betétszámla:-18000',
+bsP:'0Saját tőke:0|1Eredménytartalék:-20500|1Lekötött tartalék:20500',
+cf:'I:2500,1:0,10:2500,II:-20500,14:-20500,III:0,IV:-18000',
+key:'Az aktivált érték 20.500, de a pénzkiáramlás csak 18.000, mert az anyag a meglévő készletből jött.',
+note:'A 2016-tól hatályos Szt. már nem ismeri az alapítás-átszervezés aktivált értéke mérlegsort; a példatár a korábbi szabályozás szerint számol.'},
+
+{t:'Fordulónap utáni számla',tag:'Árbevétel',
+task:'Vállalkozásunk tárgyévet követő év január 12-én számlát bocsátott ki 1.000 eFt-ról. A számla szerint a teljesítés ideje tárgyév december 20., míg a fizetési határidő tárgyévet követő év január 30.',
+steps:[
+{x:'<b>Időbeli hovatartozás:</b> a teljesítés napja (december 20.) dönt, nem a számla kelte. Az árbevétel a tárgyévé, a vevőkövetelés év végén nyitott.',p:e('Vevők','Árbevétel',1000)}],
+is:'01:1000,I:1000,A:1000,B:0,C:1000,D:1000',
+bsA:'0Forgóeszközök:1000|1Követelések:1000|2Vevők:1000',
+bsP:'0Saját tőke:1000|1Adózott eredmény:1000',
+cf:'I:0,1:1000,9:-1000,II:0,III:0,IV:0',
+key:'A gazdasági esemény a teljesítéskor történik meg; a mérlegkészítésig ismertté vált tételt a tárgyévben kell elszámolni.'},
+
+{t:'Műtárgy bérleti joga',tag:'Immateriális',
+task:'Vállalkozásunk megvásárolta egy műtárgy bérleti jogát 2.000 eFt-ért. A szerződés értelmében a bérleti díj értéke 600 eFt évente, amelyet az esedékes év december 10-éig kell megfizetni.',
+steps:[
+{x:'<b>Bérleti jog:</b> a megvásárolt jog immateriális jószág (vagyoni értékű jog), 2.000.',p:e('Vagyoni értékű jogok','Elszámolási betétszámla',2000)},
+{x:'<b>Éves bérleti díj:</b> 600, december 10-ig kifizetve; igénybe vett szolgáltatás.',p:e('Igénybe vett szolgáltatások','Elszámolási betétszámla',600)}],
+is:'06:600,IV:600,A:-600,B:0,C:-600,D:-600',
+bsA:'0Befektetett eszközök:2000|1Immateriális javak:2000|2Vagyoni értékű jogok:2000|0Forgóeszközök:-2600|1Pénzeszközök:-2600|2Elszámolási betétszámla:-2600',
+bsP:'0Saját tőke:-600|1Adózott eredmény:-600',
+cf:'I:-600,1:-600,II:-2000,14:-2000,III:0,IV:-2600',
+key:'A jog megszerzése beruházás (befektetési CF), az éves díj működési ráfordítás.',
+note:'A megoldás a vagyoni értékű jog tárgyévi értékcsökkenését nem számolja el.'},
+
+{t:'Vevőtől kapott előleg',tag:'Előleg',
+task:'Társaságunknak egyik partnere nagy volumenű megrendelést adott. A forgótőkehiány és erős eladósodottságunk miatt hitelkérelmünket elutasította a bank. A megrendelést csak úgy tudtuk elvállalni, hogy előleget kértünk partnerünktől. Az előleget a partner átutalta. A megrendelés összege 16.000 eFt, amelyet csak a tárgyévet követő évben teljesítünk; az átutalt előleg 4.000 eFt volt.',
+steps:[
+{x:'<b>Előleg:</b> a teljesítés jövőre esik, ezért nincs árbevétel. A kapott 4.000 kötelezettség (vevőktől kapott előleg). A 16.000-es szerződéses összeg önmagában nem könyvelendő.',p:e('Elszámolási betétszámla','Vevőktől kapott előlegek',4000)}],
+is:'A:0,B:0,C:0,D:0',
+bsA:'0Forgóeszközök:4000|1Pénzeszközök:4000|2Elszámolási betétszámla:4000',
+bsP:'0Kötelezettségek:4000|1Rövid lejáratú kötelezettségek:4000|2Vevőktől kapott előlegek:4000',
+cf:'I:4000,1:0,7:4000,II:0,III:0,IV:4000',
+key:'Az előleg nem árbevétel, amíg nem teljesítünk: kötelezettség. Pénz befolyik, eredményhatás nincs.'},
+
+{t:'Hitelkamat a tőketörlesztés előtt',tag:'Hitel',
+task:'Előző év június 30-án 10.000 eFt hitelt vettünk fel 10 éves futamidővel. A hitelhez 20%-os fix kamatozás mellett jutottunk hozzá. A tőketörlesztést a futamidő 5. évében kell megkezdenünk, míg a kamat minden év június 30-án esedékes.',
+steps:[
+{x:'<b>Kamatfizetés:</b> 10.000 × 20% = 2.000, június 30-án kifizetve; pénzügyi ráfordítás.',p:e('Fizetett kamatok','Elszámolási betétszámla',2000)},
+{x:'<b>Tőke:</b> a törlesztés csak az 5. évben indul, így a tárgyévben nincs tőkemozgás; a hitel hosszú lejáratú marad.',p:[]}],
+is:'A:0,19:2000,IX:2000,B:-2000,C:-2000,D:-2000',
+bsA:'0Forgóeszközök:-2000|1Pénzeszközök:-2000|2Elszámolási betétszámla:-2000',
+bsP:'0Saját tőke:-2000|1Adózott eredmény:-2000',
+cf:'I:-2000,1:-2000,II:0,III:0,IV:-2000',
+key:'Csak a kamat terheli a tárgyévet; a tőke változatlanul hosszú lejáratú.',
+note:'Szigorúan időarányosan a július–decemberi kamat (1.000) év végén passzív időbeli elhatárolás, a januári–júniusi rész pedig az előző évi elhatárolást oldja fel. Az éves ráfordítás így is 2.000.'}
+];
+
+/* ---------- segédek ---------- */
+const fmt=v=>(v<0?'−':'')+Math.abs(Math.round(v)).toString().replace(/\B(?=(\d{3})+(?!\d))/g,'.');
+const $=s=>document.querySelector(s);
+const RM=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const SH=a=>a===SE?'SEEAÉ':a;
+let cur=0,pos=0,timer=null,D=null;
+
+const PHN=['Könyvelés','Eredményszámla','Mérlegszámla','Eredménykimutatás','Mérleg','Cash-flow'];
+const PLG={'Árbevétel':'I. Nettó árbevétel',[SE]:'II. Aktivált saját telj.','Egyéb bevételek':'III. Egyéb bevételek','ELÁBÉ':'IV. Anyagjellegű ráf.','Anyagköltség':'IV. Anyagjellegű ráf.','Igénybe vett szolgáltatások':'IV. Anyagjellegű ráf.','Bérköltség':'V. Személyi jellegű ráf.','Személyi jellegű ráfordítások':'V. Személyi jellegű ráf.','Értékcsökkenési leírás':'VI. Értékcsökkenési leírás','Egyéb ráfordítások':'VII. Egyéb ráfordítások','Fizetett kamatok':'IX. Pénzügyi műv. ráf.'};
+const PLO=['I. Nettó árbevétel','II. Aktivált saját telj.','III. Egyéb bevételek','IV. Anyagjellegű ráf.','V. Személyi jellegű ráf.','VI. Értékcsökkenési leírás','VII. Egyéb ráfordítások','IX. Pénzügyi műv. ráf.'];
+const ISACC={'01':['Árbevétel'],'03':[SE],'III':['Egyéb bevételek'],'05':['Anyagköltség'],'06':['Igénybe vett szolgáltatások'],'08':['ELÁBÉ'],'10':['Bérköltség'],'VI':['Értékcsökkenési leírás'],'VII':['Egyéb ráfordítások'],'19':['Fizetett kamatok']};
+const REAS_B={'Céltartalékok':'céltartalék felhasználása, felszabadítása','Készletek':'készlet értékvesztésének visszaírása','Ingatlanok':'ingatlan értékvesztésének visszaírása','Vevők':'tárgyi eszköz eladási ára (eszközeladás nem árbevétel)','Passzív időbeli elhatárolások':'térítés nélkül kapott eszköz elhatárolásának feloldása'};
+const REAS_R={'Készletek':'készlet értékvesztése','Műszaki berendezések':'az eladott eszköz könyv szerinti értéke','Céltartalékok':'céltartalék-képzés várható kötelezettségre'};
+const CLS={
+'Befektetett eszközök':'Tartósan, egy évnél hosszabb ideig a tevékenységet szolgáló eszközök főcsoportja.',
+'Immateriális javak':'Nem fizikai formájú, de vagyoni értéket képviselő tartós eszközök (jogok, cégérték, aktivált fejlesztés).',
+'Tárgyi eszközök':'Fizikai formájú, tartósan használt eszközök csoportja.',
+'Forgóeszközök':'Egy éven belül felhasználódó vagy pénzzé váló eszközök főcsoportja.',
+'Készletek':'Felhasználásra vagy továbbeladásra tartott eszközök csoportja.',
+'Követelések':'Mások tartozásai a vállalkozás felé.',
+'Pénzeszközök':'Készpénz és bankszámlák.',
+'Aktív időbeli elhatárolások':'Már kifizetett, de a következő évek költségét képező tétel: eszközként visszük át.',
+'Saját tőke':'A tulajdonosokat megillető forrás: jegyzett tőke, tartalékok, adózott eredmény.',
+'Kötelezettségek':'Idegen források: amivel másoknak tartozunk.',
+'Rövid lejáratú kötelezettségek':'Egy éven belül esedékes tartozások.',
+'Hosszú lejáratú kötelezettségek':'Egy éven túl esedékes tartozások.',
+'Céltartalékok':'Várható, összegében becsült jövőbeni kötelezettségre képzett forrás (önálló forrás-főcsoport).',
+'Passzív időbeli elhatárolások':'A tárgyévet terhelő, de később fizetendő költség, illetve később bevétellé váló tétel.',
+'Áruk':'Továbbértékesítési céllal vásárolt készlet.',
+'Anyagok':'Felhasználásra beszerzett készlet.',
+'Vevők':'Az árbevételből a vevő által még ki nem fizetett rész.',
+'Pénztár':'Készpénz.',
+'Elszámolási betétszámla':'Bankszámla.',
+'Műszaki berendezések':'Termelést szolgáló gépek, berendezések.',
+'Egyéb berendezések':'Irodai bútorok, felszerelések.',
+'Ingatlanok':'Épületek, telkek.',
+'Üzleti vagy cégérték':'A cégért fizetett vételár és az átvett nettó vagyon különbözete.',
+'Kísérleti fejlesztés aktivált értéke':'Aktivált, várhatóan megtérülő fejlesztési költség.',
+'Alapítás-átszervezés aktivált értéke':'Aktivált átszervezési költség (korábbi Szt. szerinti mérlegsor).',
+'Vagyoni értékű jogok':'Megvásárolt jogok, pl. bérleti jog.',
+'Beruházások, felújítások':'Befejezetlen beruházás: még folyamatban lévő, üzembe nem helyezett munka.',
+'Értékhelyesbítés':'A piaci érték és a könyv szerinti érték pozitív különbözete (felértékelés).',
+'Szállítók':'Beszerzésből eredő, még ki nem fizetett tartozás.',
+'Rövid lejáratú hitelek':'A hitel egy éven belül esedékes része.',
+'Rövid lejáratú kölcsönök':'A kölcsön egy éven belül esedékes része.',
+'Hosszú lejáratú kölcsönök':'A kölcsön egy éven túl esedékes része.',
+'Tartozások kötvénykibocsátásból':'A kibocsátott kötvények névértéke.',
+'Jövedelem-elszámolás':'A dolgozók felé fennálló, ki nem fizetett bér.',
+'Egyéb rövid lejáratú kötelezettségek':'Itt: a dolgozók felé fennálló, ki nem fizetett bér (jövedelem-elszámolás).',
+'Vevőktől kapott előlegek':'Előre kapott pénz olyan teljesítésért, amelyet még nem nyújtottunk.',
+'Jegyzett tőke':'A kibocsátott részvények névértéke.',
+'Tőketartalék':'A névérték feletti befizetés (ázsió).',
+'Eredménytartalék':'Korábbi évek felhalmozott, ki nem osztott eredménye.',
+'Lekötött tartalék':'Az eredménytartalékból átvezetett, osztalékként ki nem fizethető rész.',
+'Értékelési tartalék':'Az értékhelyesbítés saját tőkén belüli ellenpárja.'};
+const ALIAS={'Készletek':['Készletek','Áruk','Anyagok'],'Követelések':['Vevők'],'Pénzeszközök':['Pénztár','Elszámolási betétszámla'],'Jövedelem-elszámolás':['Jövedelem-elszámolási számla'],'Egyéb rövid lejáratú kötelezettségek':['Jövedelem-elszámolási számla']};
+const CFACC={'2':['Értékcsökkenési leírás'],'4':['Céltartalékok'],'6':['Szállítók'],'7':['Jövedelem-elszámolási számla','Vevőktől kapott előlegek'],'8':['Passzív időbeli elhatárolások'],'9':['Vevők'],'10':['Áruk','Anyagok','Készletek'],'11':['Aktív időbeli elhatárolások']};
+
+/* példaspecifikus magyarázatok (sor kódja szerint) */
+const WHY={
+1:{'cf:14':'A 2 gép tárgyi eszközzé vált: ez beruházás (−220). A gépek ára még nincs kifizetve, a szállítói sor (+1.210) tartalmazza, így a két sor együtt adja a helyes, nulla pénzhatást a gépekre.'},
+3:{'cf:14':'A megoldókulcs a teljes átvett eszközértéket (35.000) és a cégértéket (24.000) beruházásként mutatja: −59.000.','cf:19':'Az átvállalt 4.000 hosszú lejáratú kötelezettséget a megoldókulcs úgy kezeli, mintha hitelfelvétel lenne (+4.000). Így II + III = −55.000, ami a ténylegesen kiutalt vételár.'},
+12:{'cf:9':'Az eladási árat (22.000) a vevő még nem fizette meg: a vevőkövetelés nőtt, ezt a működési CF-ben levonjuk.','cf:15':'A befektetési CF a tárgyi eszköz eladási árát mutatja (+22.000). A −22.000 vevőváltozással együtt a nettó pénzhatás 0, mert pénz még nem folyt be.','cf:5':'Az eladás vesztesége (−2.000) csökkentette az adózás előtti eredményt. Az eladás teljes hatása a befektetési CF-ben van, ezért itt kiszűrjük: +2.000.'},
+14:{'cf:10':'A készlet (szoftver) 1.400-zal nőtt, ez pénzt kötne le (−1.400). A szállítónak azonban még nem fizettünk (+1.400), így a nettó pénzhatás 0.'},
+17:{'cf:14':'A bérből aktivált kísérleti fejlesztés beruházásnak minősül; a megoldókulcs a kifizetett 2.000-et itt, a befektetési CF-ben mutatja.'}
+};
+
+function parseKV(s,L){return s.split(',').map(x=>{const i=x.lastIndexOf(':');const k=x.slice(0,i);return {k,label:L[k]||k,v:+x.slice(i+1)}})}
+function parseBS(s){if(!s)return[];return s.split('|').map(x=>{const i=x.lastIndexOf(':');return{l:+x[0],label:x.slice(1,i),v:+x.slice(i+1)}})}
+function kids(arr,i){const out=[];for(let j=i+1;j<arr.length&&arr[j].l>arr[i].l;j++)out.push(arr[j]);if(!out.length)return[];const m=Math.min(...out.map(r=>r.l));return out.filter(r=>r.l===m)}
+const sumStr=(parts,total)=>parts.map((p,i)=>(i===0?(p.v<0?'−':''):(p.v<0?' − ':' + '))+fmt(Math.abs(p.v))+(p.n?' <small>'+p.n+'</small>':'')).join('')+' = <b>'+fmt(total)+'</b>';
+
+function build(x,n){
+  const posts=[],bal={},order=[];
+  x.steps.forEach((s,i)=>s.p.forEach(p=>{if(!(p.a in bal)){bal[p.a]=0;order.push(p.a)}bal[p.a]+=p.s==='T'?p.v:-p.v;posts.push({...p,st:i+1,cp:s.p.filter(q=>q.s!==p.s).map(q=>q.a)})}));
+  const PL=order.filter(a=>['kolt','bev'].includes(catOf(a))).map(a=>{const c=catOf(a)==='kolt';return{a,side:c?'T':'K',v:c?bal[a]:-bal[a],g:PLG[a]}}).sort((p,q)=>PLO.indexOf(p.g)-PLO.indexOf(q.g));
+  const costs=PL.filter(p=>p.side==='T').reduce((s,p)=>s+p.v,0),revs=PL.filter(p=>p.side==='K').reduce((s,p)=>s+p.v,0),res=revs-costs;
+  const BSL=[...order.filter(a=>catOf(a)==='eszk'),...order.filter(a=>['forr','tok'].includes(catOf(a)))].map(a=>{const A=catOf(a)==='eszk';return{a,side:A?'T':'K',v:A?bal[a]:-bal[a]}});
+  const isRows=parseKV(x.is,IL),isMap=Object.fromEntries(isRows.map(r=>[r.k,r.v]));
+  const A=parseBS(x.bsA),P=parseBS(x.bsP);
+  const sA=A.filter(r=>r.l===0).reduce((s,r)=>s+r.v,0),sP=P.filter(r=>r.l===0).reduce((s,r)=>s+r.v,0);
+  const bsRows=[...A.map((r,i)=>({...r,side:'A',kids:kids(A,i)})),{tot:true,side:'A',label:'Eszközök összesen',v:sA,l:0},...P.map((r,i)=>({...r,side:'P',kids:kids(P,i)})),{tot:true,side:'P',label:'Források összesen',v:sP,l:0}];
+  const cfRows=parseKV(x.cf,CL),cfMap=Object.fromEntries(cfRows.map(r=>[r.k,r.v]));
+  const seq=[];
+  x.steps.forEach((_,i)=>seq.push({ph:0,i}));
+  PL.forEach((_,i)=>seq.push({ph:1,i}));seq.push({ph:1,i:PL.length,fin:true});
+  BSL.forEach((_,i)=>seq.push({ph:2,i}));seq.push({ph:2,i:BSL.length,res:true});seq.push({ph:2,i:BSL.length+1,fin:true});
+  isRows.forEach((_,i)=>seq.push({ph:3,i}));bsRows.forEach((_,i)=>seq.push({ph:4,i}));cfRows.forEach((_,i)=>seq.push({ph:5,i}));
+  return {n,x,posts,bal,order,PL,costs,revs,res,BSL,isRows,isMap,bsRows,sA,sP,cfRows,cfMap,seq,why:WHY[n]||{}};
+}
+
+/* könyvelési tételek listája egy vagy több számlára */
+function postList(names){
+  const ps=D.posts.filter(p=>names.includes(p.a));
+  if(!ps.length)return '<div class="none">Nincs könyvelt tétel.</div>';
+  let h=ps.map(p=>`<div class="pl ${p.s}"><span class="st">${p.st}.</span><span class="s">${p.s}</span><span class="a">${SH(p.a)}${p.cp.length?' <small>↔ '+p.cp.map(SH).join(', ')+'</small>':''}</span><span class="v">${fmt(p.v)}</span></div>`).join('');
+  const nets=names.filter(a=>a in D.bal);
+  h+=nets.map(a=>`<div class="pnet"><span>${SH(a)} egyenlege</span><b>${D.bal[a]===0?'0':(D.bal[a]>0?'T ':'K ')+fmt(Math.abs(D.bal[a]))}</b></div>`).join('');
+  return h;
+}
+const calcBox=(title,html)=>`<div class="jt">${title}</div>${html}`;
+
+/* ---------- Eredménykimutatás: miért, hogyan ---------- */
+function isFx(terms){const m=D.isMap,parts=terms.filter(([c])=>m[c]).map(([c,s])=>({v:s*m[c],n:c}));return parts.length?parts:null}
+function isWhy(r){
+  const k=r.k,v=r.v,m=D.isMap,c=D.why['is:'+k];
+  const F=(terms,res)=>{const p=isFx(terms);return p?sumStr(p,res):'Minden tag 0, így <b>0</b>.'};
+  const accs=ISACC[k];
+  let why='',calc='';
+  const list=(acct,side,R)=>D.posts.filter(p=>p.a===acct&&p.s===side).map(p=>{const cp=p.cp[0];return (R[cp]||SH(cp))+' ('+fmt(p.v)+')'}).join('; ');
+  switch(k){
+    case '01':why='Az Árbevétel számla K-egyenlege. A teljesítéskor a teljes számlaérték árbevétel; hogy a vevő mennyit fizetett meg, az csak a mérleget (vevő, pénz) és a cash-flow-t érinti.';break;
+    case 'I':why='Értékesítés nettó árbevétele = belföldi (01) + export (02). Exportárbevétel nincs, ezért a részösszeg a 01. sorral egyezik.';calc=calcBox('Számítás',F([['01',1],['02',1]],v));break;
+    case '03':why='A saját előállítású eszközök aktivált értéke bevételjellegű ellentétel. Az eszköz létrehozásának költségei költségnemenként (anyag, bér, écs., szolgáltatás) a IV–VI. sorokban jelennek meg; ez a sor semlegesíti őket, mert a ráfordításból eszköz lett.';break;
+    case 'II':why='Aktivált saját teljesítmények = saját termelésű készletek állományváltozása (04, itt nincs) + saját előállítású eszközök aktivált értéke (03).';calc=calcBox('Számítás',F([['03',1]],v));break;
+    case 'III':why='Egyéb bevétel minden olyan üzemi bevétel, amely nem árbevétel. Itt: '+(list('Egyéb bevételek','K',REAS_B)||'—')+'.';break;
+    case '05':why='Az anyagköltség a felhasznált anyagok bekerülési értéke. Összköltség eljárásban akkor is itt szerepel, ha a munka eredménye eszköz lesz'+(m.II?' (ezt a II. sor ellentételezi).':'.');break;
+    case '06':{const t=D.posts.filter(p=>p.a==='Igénybe vett szolgáltatások');const K=t.filter(p=>p.s==='K').reduce((s,p)=>s+p.v,0),Tt=t.filter(p=>p.s==='T').reduce((s,p)=>s+p.v,0);const pie=t.some(p=>p.cp.includes('Passzív időbeli elhatárolások'));
+      why='Igénybe vett szolgáltatás (bérleti díj, tanácsadás): csak a tárgyévre jutó rész költség.'+(K?` A ${fmt(Tt)} díjból ${fmt(K)}-et aktív időbeli elhatárolással a következő évekre vittünk, így ${fmt(v)} marad.`:'')+(pie?' A díjat még nem fizettük ki, de a tárgyévhez tartozik, ezért passzív elhatárolással költségként elszámoljuk.':'');break}
+    case '08':why='Az eladott áruk beszerzési értéke. A beszerzéskor az áru még csak készlet (mérlegtétel); ráfordítás az eladás pillanatában lesz, így párosul az árbevétellel.';break;
+    case 'IV':why='Anyagjellegű ráfordítások = 05 anyagköltség + 06 igénybe vett szolgáltatások + 07 egyéb szolgáltatások + 08 ELÁBÉ + 09 közvetített szolgáltatások.';calc=calcBox('Számítás',F([['05',1],['06',1],['07',1],['08',1],['09',1]],v));break;
+    case '10':{const open=(D.bal['Jövedelem-elszámolási számla']||0)<0;why='A bérköltség a tárgyévi munkavégzéshez tartozik, függetlenül attól, hogy kifizettük-e. '+(open?'A ki nem fizetett bér kötelezettségként a mérlegbe kerül.':'A kifizetés a pénzeszközöket csökkentette.');break}
+    case 'V':why=m['10']?'Személyi jellegű ráfordítások = bérköltség (10) + egyéb személyi jellegű kifizetések (11) + bérjárulékok (12). A példák járulékkal nem számolnak.':'A feladat a személyi jellegű ráfordítást egy összegben adja meg; kifizetése a pénzeszközöket csökkentette.';if(m['10'])calc=calcBox('Számítás',F([['10',1]],v));else calc=calcBox('Forrás',postList(['Személyi jellegű ráfordítások']));break;
+    case 'VI':why='Az értékcsökkenés az eszközök használatából eredő értékvesztés. Költség, de pénzkiadással nem jár (a pénz a beszerzéskor ment ki).';break;
+    case 'VII':why='Egyéb ráfordítás minden olyan üzemi ráfordítás, amely nem költségnem. Itt: '+(list('Egyéb ráfordítások','T',REAS_R)||'—')+'.';break;
+    case 'A':why='Az üzemi (üzleti) tevékenység eredménye: üzemi bevételek (I, II, III) mínusz üzemi ráfordítások (IV, V, VI, VII).';calc=calcBox('Számítás',F([['I',1],['II',1],['III',1],['IV',-1],['V',-1],['VI',-1],['VII',-1]],v));break;
+    case 'VIII':why='Pénzügyi bevétel (kapott kamat, osztalék, árfolyamnyereség) ebben a példában nincs.';break;
+    case '19':why='A hitel vagy kötvény használatáért fizetett kamat pénzügyi ráfordítás, nem üzemi költség, ezért a B. pénzügyi eredményt rontja.';break;
+    case 'IX':why='Pénzügyi műveletek ráfordításai: itt csak a fizetett kamat (19. sor).';calc=calcBox('Számítás',F([['19',1]],v));break;
+    case 'B':why='Pénzügyi műveletek eredménye = pénzügyi bevételek (VIII) − pénzügyi ráfordítások (IX).';calc=calcBox('Számítás',F([['VIII',1],['IX',-1]],v));break;
+    case 'C':why='Adózás előtti eredmény = üzemi eredmény (A) + pénzügyi eredmény (B). Ez lesz a cash-flow kimutatás kiinduló sora.';calc=calcBox('Számítás',F([['A',1],['B',1]],v));break;
+    case 'D':why='Társasági adóval a példák nem számolnak, így az adózott eredmény megegyezik az adózás előtti eredménnyel. Ez az összeg kerül a mérlegbe, a saját tőkén belül az adózott eredmény sorra.';calc=calcBox('Számítás',`C ${fmt(m.C||0)} − társasági adó 0 = <b>${fmt(v)}</b>`);break;
+  }
+  if(!calc&&accs)calc=calcBox('Forrás: főkönyvi tételek',postList(accs));
+  if(v===0&&!['A','B','C','D','VIII'].includes(k))why+=' Az érték 0.';
+  return {why:c||why,calc};
+}
+
+/* ---------- Mérleg: miért, hogyan ---------- */
+function bsWhy(r){
+  if(r.tot){
+    const top=D.bsRows.filter(x=>!x.tot&&x.side===r.side&&x.l===0);
+    return {why:(r.side==='A'?'Eszközök összesen: a főcsoportok összege.':'Források összesen: a főcsoportok összege.')+' A kettős könyvvitel miatt minden tétel két helyen hat, ezért '+(r.side==='A'?'meg kell egyeznie a források összesennel.':'egyezik az eszközök összesennel.')+` Itt mindkettő ${fmt(D.sA)}.`,
+      calc:calcBox('Számítás',top.length?sumStr(top.map(x=>({v:x.v,n:x.label})),r.v):'Nincs érintett főcsoport: <b>0</b>.')};
+  }
+  const L=r.label,ov=D.why['bs:'+L];
+  const dir=r.v>0?`${fmt(r.v)}-tal nő`:r.v<0?`${fmt(Math.abs(r.v))}-tal csökken`:'nem változik';
+  let why=(CLS[L]?CLS[L]+' ':''),calc='';
+  if(r.kids.length){
+    why+=`A csoport ${dir}: az alábbi sorok összege.`;
+    calc=calcBox('Részösszeg',sumStr(r.kids.map(x=>({v:x.v,n:x.label})),r.v));
+  }else if(L==='Adózott eredmény'){
+    why=`Az eredménykimutatás D. sorából jön (${fmt(r.v)}). Ez köti össze a két kimutatást: a tárgyévi ${r.v>=0?'nyereség növeli':'veszteség csökkenti'} a saját tőkét.`;
+    calc=calcBox('Kapcsolat','EK D. adózott eredmény = <b>'+fmt(r.v)+'</b>');
+  }else if(L==='Saját tőke'){
+    why+='Eredményhatás és tőkemozgás nincs, ezért a saját tőke nem változik.';
+  }else{
+    const names=(ALIAS[L]||[L]).filter(a=>a in D.bal);
+    why+=`A tárgyévben ${dir}.`+(r.v===0&&names.length?' A könyvelt tételek kiegyenlítik egymást, a számla lezárul.':'');
+    calc=calcBox('Forrás: főkönyvi tételek',names.length?postList(names):'<div class="none">Közvetlen tétel nincs.</div>');
+  }
+  return {why:ov||why,calc};
+}
+
+/* ---------- Cash-flow: miért, hogyan ---------- */
+function cfWhy(r,i){
+  const k=r.k,v=r.v,ov=D.why['cf:'+k],pos=v>0,neg=v<0,R=D.cfRows;
+  let why='',calc='';
+  const sec=['I','II','III'];
+  if(sec.includes(k)){
+    const items=[];for(let j=i+1;j<R.length&&!['I','II','III','IV'].includes(R[j].k);j++)items.push(R[j]);
+    const nm={I:'Működési (szokásos tevékenységből származó)',II:'Befektetési',III:'Finanszírozási'}[k];
+    why=nm+' cash flow: '+({I:'az adózás előtti eredményből indul, majd kiszűri a pénzmozgás nélküli tételeket és a forgótőke változását.',II:'tartós eszközök beszerzése és eladása.',III:'tulajdonosi és hitelezői pénzmozgások (tőkebevonás, hitel, kötvény, törlesztés).'}[k]);
+    calc=calcBox('Számítás',items.length?sumStr(items.map(x=>({v:x.v,n:x.k+'.'})),v):'Nincs ilyen tétel: <b>0</b>.');
+    return {why:ov||why,calc};
+  }
+  if(k==='IV'){
+    const pz=D.bsRows.find(x=>x.label==='Pénzeszközök');
+    why='A pénzeszközök változása a három rész összege. Ellenőrzés: egyeznie kell a mérleg pénzeszközök sorának változásával'+(pz?` (${fmt(pz.v)}).`:' (itt 0).');
+    calc=calcBox('Számítás',sumStr(['I','II','III'].map(c=>({v:D.cfMap[c]||0,n:c})),v));
+    return {why:ov||why,calc};
+  }
+  const T={
+   '1':'Az indirekt módszer kiindulópontja az adózás előtti eredmény (EK C. sor). A következő sorok kiszűrik azokat a tételeket, amelyek az eredményt pénzmozgás nélkül alakították.',
+   '2':'Az értékcsökkenés költségként csökkentette az eredményt, de pénzkiadással nem járt, ezért visszaadjuk (+).',
+   '3':pos?'Az elszámolt értékvesztés csökkentette az eredményt, de pénzt nem mozgatott, ezért visszaadjuk (+).':'A visszaírt értékvesztés növelte az eredményt pénzbeáramlás nélkül, ezért levonjuk (−).',
+   '4':pos?'A céltartalék-képzés ráfordításként csökkentette az eredményt, de pénzkiadás nem volt, ezért visszaadjuk (+).':'A céltartalék felhasználása, felszabadítása egyéb bevételként növelte az eredményt pénz nélkül, ezért levonjuk (−). A tényleges kiadások már a költségsorokban szerepelnek.',
+   '5':pos?'Az eszközeladás vesztesége csökkentette az eredményt; az eladás teljes pénzhatása a befektetési CF-be tartozik, ezért itt visszaadjuk (+).':'Az eszközeladás nyeresége a befektetési CF-be tartozik, ezért itt levonjuk (−).',
+   '6':pos?'A szállítói tartozás nőtt: a beszerzés megtörtént, de még nem fizettünk, a pénz bent maradt, ezért hozzáadjuk (+).':'A szállítói tartozás csökkent: kifizettük, ezért levonjuk (−).',
+   '7':pos?'Egyéb rövid lejáratú kötelezettség nőtt (ki nem fizetett bér, kapott előleg): a pénz bent maradt vagy befolyt, ezért hozzáadjuk (+).':'Egyéb rövid lejáratú kötelezettség csökkent, ezért levonjuk (−).',
+   '8':'A passzív időbeli elhatárolás nőtt: a költség terhelte az eredményt, de nem fizettük ki, ezért visszaadjuk (+).',
+   '9':neg?'A vevőkövetelés nőtt: az árbevétel egy része nem folyt be pénzként, ezért levonjuk (−).':'A vevőkövetelés csökkent: korábbi követelés folyt be, ezért hozzáadjuk (+).',
+   '10':pos?'A készletek csökkentek: a felhasználás, eladás költségként csökkentette az eredményt, de a pénz nem most ment ki, ezért visszaadjuk (+).':'A készletek nőttek, a beszerzés pénzt köt le, ezért levonjuk (−).',
+   '11':'Az aktív időbeli elhatárolás nőtt: kifizettük, de nem a tárgyév költsége, ezért a pénzkiáramlást itt levonjuk (−).',
+   '14':'Befektetett eszközök beszerzése a befektetési CF-ben kiáramlás (−). Ha a beszerzés pénz nélkül történt (aktiválás, kifizetetlen számla), az ellentétel a működési CF-ben van, így a végösszeg helyes marad.',
+   '15':'A befektetett eszköz eladási ára a befektetési CF-ben beáramlás (+).',
+   '17':'A részvénykibocsátásból befolyt teljes összeg (névérték + ázsió) finanszírozási beáramlás.',
+   '18':'A kötvénykibocsátásból befolyt pénz finanszírozási beáramlás.',
+   '19':'A felvett hitel, kölcsön finanszírozási beáramlás.',
+   '24':'A hitel tőketörlesztése finanszírozási kiáramlás. A kamat nem itt, hanem az eredményen keresztül a működési CF-ben jelenik meg.'};
+  why=T[k]||'';
+  if(k==='1')calc=calcBox('Kapcsolat','EK C. adózás előtti eredmény = <b>'+fmt(v)+'</b>');
+  else if(CFACC[k]){const names=CFACC[k].filter(a=>a in D.bal);
+    const rule=k==='2'?'Költség, pénz nélkül → +':(['9','10','11'].includes(k)?'Eszköz nő → pénz kötődik le (−); eszköz csökken → (+)':'Forrás nő → pénz marad bent (+); forrás csökken → (−)');
+    calc=calcBox('Mérlegváltozásból',(names.length?names.map(a=>{const c=catOf(a),ch=c==='eszk'||c==='kolt'?D.bal[a]:-D.bal[a];return `<div class="pnet"><span>${SH(a)} változása</span><b>${ch>0?'+':''}${fmt(ch)}</b></div>`}).join(''):'')+`<div class="rule">${rule}</div><div class="pnet"><span>CF-sor</span><b>${v>0?'+':''}${fmt(v)}</b></div>`);}
+  else if(k==='3'||k==='5')calc=calcBox('Korrekció',`Eredményhatás ${fmt(-v)} → visszafordítva: <b>${v>0?'+':''}${fmt(v)}</b>`);
+  else calc=calcBox('Pénzmozgás','<b>'+(v>0?'+':'')+fmt(v)+'</b>');
+  return {why:ov||why,calc};
+}
+
+/* ---------- navigáció ---------- */
+function buildNav(){
+  $('#nav').innerHTML=EX.map((x,i)=>`<li><button data-i="${i}" title="${x.t}"><span class="n">${String(i+1).padStart(2,'0')}</span><span class="t">${x.t}</span></button></li>`).join('');
+  $('#nav').addEventListener('click',ev=>{const b=ev.target.closest('button');if(b)go(+b.dataset.i)});
+}
+function go(i){
+  stop();cur=Math.max(0,Math.min(EX.length-1,i));pos=0;D=build(EX[cur],cur+1);
+  try{localStorage.setItem('szv-cur',cur)}catch(_){}
+  history.replaceState(null,'','#p'+(cur+1));
+  document.querySelectorAll('#nav button').forEach(b=>b.setAttribute('aria-current',+b.dataset.i===cur?'true':'false'));
+  const nb=document.querySelector('#nav button[aria-current="true"]');nb&&nb.scrollIntoView({block:'nearest',inline:'center'});
+  renderMain();
+}
+
+function renderMain(){
+  const x=EX[cur],n=cur+1;
+  $('#main').innerHTML=`
+  <section class="head">
+    <div class="eyebrow">Példa ${String(n).padStart(2,'0')} / ${EX.length} · <em>${x.tag}</em></div>
+    <h2>${x.t}</h2>
+    <p class="task">${x.task}</p>
+  </section>
+  <section class="player" aria-label="Lépésenkénti megoldás">
+    <div class="phases" id="phases" role="tablist">${PHN.map((p,i)=>`<button data-p="${i}" role="tab"><span>${i+1}</span>${p}</button>`).join('')}</div>
+    <div class="ctrl">
+      <button class="btn" id="prev">← Előző</button>
+      <button class="btn pri" id="next">Következő →</button>
+      <button class="btn" id="play">▶ Lejátszás</button>
+      <button class="btn" id="end">Szakasz vége</button>
+      <div class="dots" id="dots"></div>
+    </div>
+    <div id="stage"></div>
+  </section>
+  <section aria-label="Összesítés">
+    <h3 class="sec-t">Összesítés <small>az esemény teljes hatása a tárgyévi kimutatásokra</small></h3>
+    <div class="stmts" id="stmts"></div>
+  </section>
+  <section class="take">
+    <div class="card"><div class="lbl2">A lényeg</div><p>${x.key}</p></div>
+    ${x.note?`<div class="card note"><div class="lbl2">Megjegyzés a megoldókulcshoz</div><p>${x.note}</p></div>`:''}
+  </section>
+  <div class="pager">
+    <button class="btn" id="pp" ${cur===0?'disabled':''}>← ${cur>0?cur+'. '+EX[cur-1].t:'Első példa'}</button>
+    <span class="kbd"><kbd>←</kbd><kbd>→</kbd> lépés · <kbd>Shift</kbd>+<kbd>←</kbd><kbd>→</kbd> példa</span>
+    <button class="btn" id="np" ${cur===EX.length-1?'disabled':''}>${cur<EX.length-1?(cur+2)+'. '+EX[cur+1].t:'Utolsó példa'} →</button>
+  </div>`;
+  $('#prev').onclick=()=>{stop();setPos(pos-1)};
+  $('#next').onclick=()=>{stop();setPos(pos+1)};
+  $('#end').onclick=()=>{stop();const ph=D.seq[pos].ph;let j=pos;while(j+1<D.seq.length&&D.seq[j+1].ph===ph)j++;setPos(j)};
+  $('#play').onclick=()=>timer?stop():play();
+  $('#phases').onclick=ev=>{const b=ev.target.closest('button');if(b){stop();setPos(D.seq.findIndex(s=>s.ph===+b.dataset.p))}};
+  $('#dots').onclick=ev=>{const b=ev.target.closest('button');if(b){stop();setPos(+b.dataset.q)}};
+  $('#pp').onclick=()=>go(cur-1);$('#np').onclick=()=>go(cur+1);
+  renderStmts();render();
+  window.scrollTo({top:0,behavior:RM?'auto':'smooth'});
+}
+function setPos(p){p=Math.max(0,Math.min(D.seq.length-1,p));if(p===pos)return;pos=p;render()}
+
+function render(){
+  const s=D.seq[pos],ph=s.ph;
+  $('#prev').disabled=pos===0;$('#next').disabled=pos===D.seq.length-1;
+  document.querySelectorAll('#phases button').forEach(b=>{const p=+b.dataset.p;b.className=p===ph?'on':(p<ph?'done':'');b.setAttribute('aria-selected',p===ph)});
+  const idx=D.seq.map((q,i)=>[q,i]).filter(([q])=>q.ph===ph);
+  $('#dots').innerHTML=idx.map(([q,i],j)=>`<button data-q="${i}" class="${i===pos?'cur':(i<pos?'done':'')}" aria-label="${j+1}. lépés">${j+1}</button>`).join('');
+  $('#end').disabled=idx[idx.length-1][1]===pos;
+  const k=idx.findIndex(([,i])=>i===pos)+1,N=idx.length;
+  const head=`<div class="k">${PHN[ph].toUpperCase()} · ${k}. / ${N}</div>`;
+  const st=$('#stage');
+  if(ph===0)st.innerHTML=stBook(s,head);
+  else if(ph===1)st.innerHTML=stPL(s,head);
+  else if(ph===2)st.innerHTML=stBS(s,head);
+  else st.innerHTML=stStmt(s,head,ph);
+  const c=st.querySelector('.srow.cur');if(c&&ph>=3)c.scrollIntoView({block:'nearest',behavior:RM?'auto':'smooth'});
+}
+
+/* T-számlák rácsa; closedPL/closedBS = lezárt számlák halmaza, hot = aktuális számla */
+function tGrid(upTo,closed,hot,target){
+  const acc=new Map();
+  D.posts.filter(p=>p.st<=upTo).forEach(p=>{if(!acc.has(p.a))acc.set(p.a,{T:[],K:[],first:p.st});acc.get(p.a)[p.s].push(p)});
+  if(!acc.size)return '<div class="empty">Ebben a lépésben még nincs könyvelt tétel.</div>';
+  return '<div class="taccs">'+[...acc].map(([a,o])=>{
+    const c=catOf(a),bal=o.T.reduce((s,r)=>s+r.v,0)-o.K.reduce((s,r)=>s+r.v,0);
+    const isNew=r=>target===undefined&&r.st===upTo;
+    const isHot=target===undefined?[...o.T,...o.K].some(r=>r.st===upTo):a===hot;
+    const cl=closed&&closed.get(a);
+    const rows=(arr,side)=>arr.map(r=>`<div class="r ${isNew(r)?'new':''}"><i>${r.st}.</i><span>${fmt(r.v)}</span></div>`).join('')+(cl&&bal!==0&&side===(bal>0?'K':'T')?`<div class="r z ${a===hot?'new':''}"><i>Z</i><span>${fmt(Math.abs(bal))}</span></div>`:'');
+    const fresh=target===undefined&&o.first===upTo;
+    return `<div class="tacc ${isHot?'hot':''} ${cl&&a!==hot?'closed':''}" style="${fresh?'':'animation:none'}">
+      <div class="th"><span class="nm" title="${a}">${SH(a)}</span><span class="cat" style="color:var(--c-${c})">${CATN[c]}</span></div>
+      <div class="tb"><div class="col d"><span class="ch">T</span>${rows(o.T,'T')}</div><div class="col c"><span class="ch">K</span>${rows(o.K,'K')}</div></div>
+      <div class="tf">${cl?`<span>Lezárva → ${cl}</span><b>0</b>`:`<span>Egyenleg</span><b>${bal===0?'0':(bal>0?'T ':'K ')+fmt(Math.abs(bal))}</b>`}</div></div>`}).join('')+'</div>';
+}
+const jline=(s,a,v)=>`<div class="jl ${s}"><span class="s">${s}</span><span class="a">${a}</span><span class="v">${fmt(v)}</span></div>`;
+
+function stBook(s,head){
+  const st=D.x.steps[s.i];
+  const j=st.p.length?[...st.p].sort((a,b)=>a.s===b.s?0:(a.s==='T'?-1:1)).map(p=>jline(p.s,SH(p.a),p.v)).join(''):'<div class="none">Ebben a lépésben nincs könyvelés.</div>';
+  return `<div class="stepbox"><div class="expl" aria-live="polite">${head}<p>${st.x}</p></div><div class="journal"><div class="jt">Könyvelési tétel</div>${j}</div></div>${tGrid(s.i+1)}`;
+}
+
+function sumT(title,lt,rt,L,R,totL,totR,showTot){
+  const rows=arr=>arr.map(r=>`<div class="sr ${r.cls||''}"><span>${r.g?`<small>${r.g}</small>`:''}${r.n}</span><b>${fmt(r.v)}</b></div>`).join('')||'<div class="sr ph"><span>—</span></div>';
+  return `<div class="sumT"><div class="sumh">${title}</div><div class="sumb"><div class="col d"><div class="ch">${lt}</div>${rows(L)}</div><div class="col c"><div class="ch">${rt}</div>${rows(R)}</div></div>${showTot?`<div class="sumf"><span>Összesen: <b>${fmt(totL)}</b></span><span>Összesen: <b>${fmt(totR)}</b></span></div>`:''}</div>`;
+}
+
+function stPL(s,head){
+  const PL=D.PL,done=PL.slice(0,s.fin?PL.length:s.i+1),cur=s.fin?null:PL[s.i];
+  const closed=new Map(done.map(p=>[p.a,'Eredmény']));
+  let x,j;
+  if(!PL.length){x='Ebben a példában nincs bevételi vagy ráfordítási számla, ezért az eredményszámlára nem kerül tétel: <b>az eredmény 0</b>.';j='<div class="none">Nincs zárótétel.</div>'}
+  else if(s.fin){const pr=D.res>=0;x=`<b>Az eredmény meghatározása:</b> bevételek ${fmt(D.revs)} − ráfordítások ${fmt(D.costs)} = <b>${fmt(D.res)}</b>. ${D.res===0?'A két oldal egyenlő, az eredmény 0.':pr?'A bevételi (K) oldal nagyobb: nyereség. Az egyenleget a T oldalon rendezzük.':'A ráfordítási (T) oldal nagyobb: veszteség. Az egyenleget a K oldalon rendezzük.'} Adó nincs, így ez az adózott eredmény is.`;
+    j=D.res===0?'<div class="none">Nincs egyenleg.</div>':(D.res>0?jline('T','Eredményszámla',D.res)+jline('K','Adózott eredmény (mérleg)',D.res):jline('T','Adózott eredmény (mérleg)',-D.res)+jline('K','Eredményszámla',-D.res))}
+  else{const p=cur,cost=p.side==='T';
+    x=`<b>${SH(p.a)} lezárása:</b> ${cost?'ráfordítás':'bevétel'}, ${cost?'T':'K'}-egyenlege ${fmt(p.v)}. Az eredményszámla <b>${cost?'T (ráfordítás)':'K (bevétel)'}</b> oldalára kerül, az eredménykimutatás „${p.g}” sorába. A zárótétellel (Z) a számla egyenlege 0 lesz.`;
+    j=cost?jline('T','Eredményszámla',p.v)+jline('K',SH(p.a),p.v):jline('T',SH(p.a),p.v)+jline('K','Eredményszámla',p.v)}
+  const L=done.filter(p=>p.side==='T').map(p=>({n:SH(p.a),g:p.g,v:p.v,cls:p===cur?'new':''}));
+  const R=done.filter(p=>p.side==='K').map(p=>({n:SH(p.a),g:p.g,v:p.v,cls:p===cur?'new':''}));
+  if(s.fin&&D.res!==0)(D.res>0?L:R).push({n:D.res>0?'Eredmény (nyereség)':'Eredmény (veszteség)',v:Math.abs(D.res),cls:'res new'});
+  const tl=L.reduce((a,r)=>a+r.v,0),tr=R.reduce((a,r)=>a+r.v,0);
+  return `<div class="stepbox"><div class="expl" aria-live="polite">${head}<p>${x}</p></div><div class="journal"><div class="jt">Zárótétel</div>${j}</div></div>
+  ${sumT('Eredményszámla','T · Ráfordítások','K · Bevételek',L,R,tl,tr,s.fin)}
+  <details class="mini" open><summary>Főkönyvi számlák</summary>${tGrid(D.x.steps.length,closed,cur&&cur.a,true)}</details>`;
+}
+
+function stBS(s,head){
+  const B=D.BSL,n=s.res||s.fin?B.length:s.i+1,done=B.slice(0,n),cur=s.res||s.fin?null:B[s.i];
+  const closed=new Map([...D.PL.map(p=>[p.a,'Eredmény']),...done.map(p=>[p.a,'Mérleg'])]);
+  let x,j;
+  if(s.res){x=`<b>Adózott eredmény:</b> az eredményszámla egyenlege (${fmt(D.res)}) a saját tőke részeként a mérlegszámla <b>forrás (K)</b> oldalára kerül. ${D.res<0?'Veszteség esetén negatív forrásként jelenik meg.':''} Ezzel kapcsolódik össze az eredménykimutatás és a mérleg.`;
+    j=D.res===0?'<div class="none">Az eredmény 0, nincs tétel.</div>':(D.res>0?jline('T','Eredményszámla',D.res)+jline('K','Zárómérleg-számla',D.res):jline('T','Zárómérleg-számla',-D.res)+jline('K','Eredményszámla',-D.res))}
+  else if(s.fin){const a=B.filter(p=>p.side==='T').reduce((q,p)=>q+p.v,0),f=B.filter(p=>p.side==='K').reduce((q,p)=>q+p.v,0)+D.res;
+    x=`<b>Egyezés:</b> eszközök változása ${fmt(a)} = források változása ${fmt(f)}. A kettős könyvvitel miatt minden tétel két számlán hat, ezért a mérlegszámla két oldala mindig egyenlő. A mérlegszámla <b>változásokat</b> mutat, ezért a csökkenés negatív előjellel szerepel.`;
+    j=`<div class="pnet"><span>Eszközök (T)</span><b>${fmt(a)}</b></div><div class="pnet"><span>Források (K)</span><b>${fmt(f)}</b></div>`}
+  else{const p=cur,A=p.side==='T',c=catOf(p.a);
+    x=`<b>${SH(p.a)} lezárása:</b> ${CATN[c].toLowerCase()}számla, változása <b>${p.v>0?'+':''}${fmt(p.v)}</b>. A mérlegszámla <b>${A?'eszköz (T)':'forrás (K)'}</b> oldalára kerül. ${p.v===0?'Egyenlege 0, mert a tételei kiegyenlítik egymást: a mérlegben nem változik.':p.v<0?(A?'Az eszköz csökkent, ezért negatív előjellel szerepel.':'A forrás csökkent, ezért negatív előjellel szerepel.'):(A?'Az eszköz nőtt.':'A forrás nőtt.')}`;
+    const v=Math.abs(p.v);
+    j=p.v===0?'<div class="none">Egyenleg 0: zárótétel nélkül lezárul.</div>':((A===(p.v>0))?jline('T','Zárómérleg-számla',v)+jline('K',SH(p.a),v):jline('T',SH(p.a),v)+jline('K','Zárómérleg-számla',v))}
+  const L=done.filter(p=>p.side==='T').map(p=>({n:SH(p.a),g:CATN[catOf(p.a)],v:p.v,cls:p===cur?'new':''}));
+  const R=done.filter(p=>p.side==='K').map(p=>({n:SH(p.a),g:CATN[catOf(p.a)],v:p.v,cls:p===cur?'new':''}));
+  if(s.res||s.fin)R.push({n:'Adózott eredmény',g:'Saját tőke',v:D.res,cls:'res'+(s.res?' new':'')});
+  const tl=L.reduce((a,r)=>a+r.v,0),tr=R.reduce((a,r)=>a+r.v,0);
+  return `<div class="stepbox"><div class="expl" aria-live="polite">${head}<p>${x}</p></div><div class="journal"><div class="jt">Zárótétel</div>${j}</div></div>
+  ${sumT('Zárómérleg-számla (változások)','T · Eszközök','K · Források',L,R,tl,tr,s.fin)}
+  <details class="mini" open><summary>Főkönyvi számlák</summary>${tGrid(D.x.steps.length,closed,cur&&cur.a,true)}</details>`;
+}
+
+function srow(cls,label,v,state){return `<div class="srow row ${cls} ${state} ${v===0?'zero':''}"><span>${label}</span><span class="v ${v<0?'neg':''}">${fmt(v)}</span></div>`}
+function stStmt(s,head,ph){
+  let card,w;
+  if(ph===3){const R=D.isRows;card=`<h3>Eredménykimutatás <span class="badge" style="background:var(--sunk);color:var(--muted)">összköltség eljárás</span></h3>`+R.map((r,i)=>srow(/^\d/.test(r.k)?'it':'sub',r.label,r.v,i<s.i?'past':i===s.i?'cur':'fut')).join('');w=isWhy(R[s.i])}
+  else if(ph===4){const R=D.bsRows;const side=sd=>R.map((r,i)=>[r,i]).filter(([r])=>r.side===sd).map(([r,i])=>srow(r.tot?'tot':'l'+r.l,r.label,r.v,i<s.i?'past':i===s.i?'cur':'fut')).join('');
+    card=`<h3>Mérleg</h3><div class="bs"><div class="side"><h4>Eszközök</h4>${side('A')}</div><div class="side"><h4>Források</h4>${side('P')}</div></div>`;w=bsWhy(R[s.i])}
+  else{const R=D.cfRows;card=`<h3>Cash-flow kimutatás <span class="badge" style="background:var(--sunk);color:var(--muted)">indirekt</span></h3>`+R.map((r,i)=>srow(/^\d/.test(r.k)?'it':(r.k==='IV'?'tot':'sub'),r.label,r.v,i<s.i?'past':i===s.i?'cur':'fut')).join('');w=cfWhy(R[s.i],s.i)}
+  const label=ph===3?D.isRows[s.i].label:ph===4?D.bsRows[s.i].label:D.cfRows[s.i].label;
+  const val=ph===3?D.isRows[s.i].v:ph===4?D.bsRows[s.i].v:D.cfRows[s.i].v;
+  return `<div class="split"><div class="card stmt">${card}</div><div class="panel"><div class="expl" aria-live="polite">${head}<div class="ln">${label}</div><div class="lv num ${val<0?'neg':''}">${fmt(val)}</div><p>${w.why}</p></div>${w.calc?`<div class="journal">${w.calc}</div>`:''}</div></div>`;
+}
+
+/* ---------- összesítő kimutatások ---------- */
+function rowHTML(cls,label,v,d){return `<div class="row ${cls} ${v===0?'zero':''}" style="animation-delay:${d}ms"><span>${label}</span><span class="v ${v<0?'neg':''}" data-v="${v}">${fmt(v)}</span></div>`}
+function renderStmts(){
+  let d=0;const g=35;
+  const A=D.bsRows.filter(r=>r.side==='A'),P=D.bsRows.filter(r=>r.side==='P');
+  const side=(rows,name)=>`<div class="side"><h4>${name}</h4>${rows.map(r=>rowHTML(r.tot?'tot':'l'+r.l,r.label,r.v,(d+=g))).join('')}</div>`;
+  const bs=`<div class="card wide"><h3>Mérleg <span class="badge">${D.sA===D.sP?'Eszközök = Források: '+fmt(D.sA):'Eltérés!'}</span></h3><div class="bs">${side(A,'Eszközök')}${side(P,'Források')}</div></div>`;
+  d=0;const is=D.isRows.map(r=>rowHTML(/^\d/.test(r.k)?'it':'sub',r.label,r.v,(d+=g))).join('');
+  d=0;const cf=D.cfRows.map(r=>rowHTML(/^\d/.test(r.k)?'it':(r.k==='IV'?'tot':'sub'),r.label,r.v,(d+=g))).join('');
+  $('#stmts').innerHTML=bs+`<div class="card"><h3>Eredménykimutatás</h3>${is}</div><div class="card"><h3>Cash-flow kimutatás</h3>${cf}</div>`;
+  if(!RM)countUp();
+}
+function countUp(){
+  const els=[...document.querySelectorAll('#stmts .v[data-v]')],t0=performance.now(),Dur=650;
+  function f(t){const k=Math.min(1,(t-t0)/Dur),ez=1-Math.pow(1-k,3);els.forEach(el=>{el.textContent=fmt(+el.dataset.v*ez)});if(k<1)requestAnimationFrame(f)}
+  requestAnimationFrame(f);
+}
+
+function play(){
+  if(pos>=D.seq.length-1){pos=0;render()}
+  $('#play').textContent='❚❚ Szünet';
+  timer=setInterval(()=>{if(pos>=D.seq.length-1){stop();return}pos++;render()},3000);
+}
+function stop(){if(timer){clearInterval(timer);timer=null}const b=$('#play');if(b)b.textContent='▶ Lejátszás'}
+
+document.addEventListener('keydown',ev=>{
+  if(ev.target.closest('input,textarea,select'))return;
+  if(ev.key==='ArrowRight'){ev.preventDefault();ev.shiftKey?go(cur+1):(stop(),setPos(pos+1))}
+  if(ev.key==='ArrowLeft'){ev.preventDefault();ev.shiftKey?go(cur-1):(stop(),setPos(pos-1))}
+});
+
+buildNav();
+let start=0;
+const h=location.hash.match(/^#p(\d+)$/);
+if(h)start=+h[1]-1;else{try{const s=localStorage.getItem('szv-cur');if(s!==null)start=+s}catch(_){}}
+go(isNaN(start)?0:start);
+</script>
+
+</body>
+</html>
